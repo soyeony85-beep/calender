@@ -1594,7 +1594,6 @@ export default function App() {
                                         width: widthCalc,
                                         top: "2px",
                                         height: `${blockDuration * 64 - 4}px`,
-                                        border: `1.5px dashed ${p.avatarColor}55`,
                                         backgroundColor: `${p.avatarColor}0F`,
                                         zIndex: 18,
                                         padding: "7.5px 9.5px",
@@ -1809,7 +1808,6 @@ export default function App() {
                       <ModalGlyph name="calendar" />
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="w-3 h-3 rounded-full order-first" style={{ backgroundColor: owner.avatarColor }} />
                           <span className="text-[16px] leading-6 font-semibold text-[#202124]">{owner.name}</span>
                         </div>
                         <p className="text-[13px] leading-5 text-[#5f6368]">바쁨 · 기본 공개 설정 · 30분 전에 알림</p>
@@ -2404,7 +2402,7 @@ export default function App() {
                 <div className="flex items-center gap-3">
                   <ModalGlyph name="calendar" />
                   <div>
-                    <div className="flex items-center gap-2"><span className="text-sm text-[#202124]">윤소연</span><div className="w-3 h-3 rounded-full bg-[#4396FB]" /></div>
+                    <div className="flex items-center gap-2"><span className="text-sm text-[#202124]">윤소연</span></div>
                     <p className="text-xs text-[#5f6368] mt-0.5">바쁨 · 기본 공개 설정 · 30분 전에 알림</p>
                   </div>
                 </div>
