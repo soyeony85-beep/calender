@@ -35,7 +35,7 @@ type CalendarEventDetail = {
 
 /* ── Data ── */
 const DEFAULT_PROJECTS: Project[] = [
-  { id: "toss-design", name: "토스 디자인 챌린지", phase: "기획",   color: "#4396FB", bg: "#ECF5FF", members: [1,2,3] },
+  { id: "toss-design", name: "토스 디자인 챌린지", phase: "기획",   color: "#4396FB", bg: "#ECF5FF", members: [1,2,3,4,5] },
   { id: "toss-pay",   name: "토스 페이",           phase: "개발",   color: "#3182F6", bg: "#EFF6FF", members: [1,2,4,5] },
   { id: "ux",         name: "UX 리서치",           phase: "리서치", color: "#00C3B2", bg: "#E0F9F7", members: [2,3] },
   { id: "redesign",   name: "앱 리디자인",          phase: "디자인", color: "#8B5CF6", bg: "#EDE9FE", members: [1,2,3,4,5] },
