@@ -202,6 +202,23 @@ function RoomResourceGlyph({ className = "w-6 h-6 shrink-0" }: { className?: str
   );
 }
 
+function WorkingLocationGlyph({ type, className = "w-5 h-5 shrink-0" }: { type: "home" | "office"; className?: string }) {
+  if (type === "home") {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+        <path d="M4 10.6 12 4l8 6.6v8.15c0 .69-.56 1.25-1.25 1.25H15v-5.2c0-.44-.36-.8-.8-.8h-4.4c-.44 0-.8.36-.8.8V20H5.25C4.56 20 4 19.44 4 18.75V10.6Z" fill="#0B57D0" />
+      </svg>
+    );
+  }
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <path d="M5 4.75C5 4.34 5.34 4 5.75 4h8.5c.41 0 .75.34.75.75V20H5V4.75Z" fill="#0B57D0" />
+      <path d="M15 9h3.25c.41 0 .75.34.75.75V20h-4V9Z" fill="#0B57D0" opacity=".78" />
+      <path d="M7.5 7h2v2h-2V7ZM11 7h2v2h-2V7ZM7.5 11h2v2h-2v-2ZM11 11h2v2h-2v-2ZM7.5 15h2v2h-2v-2ZM11 15h2v2h-2v-2Z" fill="white" opacity=".92" />
+    </svg>
+  );
+}
+
 function OutOfOfficeChip({ person }: { person: { name: string; avatarColor: string } }) {
   return (
     <div
@@ -674,6 +691,7 @@ export default function App() {
   const [roomSearch, setRoomSearch] = useState("");
   const [locationVal, setLocationVal] = useState("");
   const [descriptionVal, setDescriptionVal] = useState("");
+  const [workingLocation, setWorkingLocation] = useState<"home" | "office" | "other">("office");
 
   /* ── Project / Meeting type (extendable) ── */
   const [projects, setProjects] = useState<Project[]>(DEFAULT_PROJECTS);
@@ -902,6 +920,7 @@ export default function App() {
   function openPopup(date: Date, hour: number) {
     setPopupDate(date); setStartH(hour); setStartM(0); setEndH(hour + 1); setEndM(0);
     setPopupTitle(""); setProjectId(null); setMeetingTypeId(null); setRoomVal(""); setRoomSearch(""); setLocationVal(""); setDescriptionVal("");
+    setWorkingLocation("office");
     setLocationMode("none");
     setIsAllDay(false); setRepeatVal("반복 안 함"); setActiveTab("일정");
     setShowDatePicker(false); setShowStartPicker(false); setShowEndPicker(false); setShowRepeatPicker(false);
@@ -945,6 +964,18 @@ export default function App() {
         description: descriptionVal,
       })),
     ]);
+    setPopupOpen(false);
+  }
+
+  function handleSaveWorkingLocation() {
+    const label = workingLocation === "home" ? "재택근무" : workingLocation === "office" ? "오피스 근무" : "외근";
+    setMyPrefs(prev => ({
+      ...prev,
+      oooDays: workingLocation === "other"
+        ? Array.from(new Set([...prev.oooDays, popupDate.getDay()])).filter(day => day >= 1 && day <= 5)
+        : prev.oooDays,
+    }));
+    setLocationVal(label);
     setPopupOpen(false);
   }
 
@@ -1994,12 +2025,81 @@ export default function App() {
 
               {/* Tabs */}
               <div className="px-5 pb-4 flex gap-2">
-                {["일정","할 일","약속 일정"].map(tab => (
+                {["일정","할 일","근무장소 설정"].map(tab => (
                   <button key={tab} onClick={() => setActiveTab(tab)}
                     className={`px-4 py-1.5 rounded-full text-[14px] leading-5 font-medium transition-colors ${activeTab === tab ? "bg-[#ECF5FF] text-[#4396FB]" : "text-[#5f6368] hover:bg-[#e8eaed]"}`}>{tab}</button>
                 ))}
               </div>
 
+              {activeTab === "근무장소 설정" ? (
+                <>
+                  <div className="bg-white rounded-[16px] mx-4 mb-3 px-5 py-6">
+                    <div className="flex items-start gap-4">
+                      <ModalGlyph name="clock" className="mt-1" />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-3">
+                          <p className="text-[18px] leading-7 font-medium text-[#202124]">
+                            {fmtDateShort(popupDate)} – {fmtDateShort(popupDate)}
+                          </p>
+                          <button
+                            type="button"
+                            className="h-11 px-5 rounded-full border border-[#80868b] text-[15px] leading-5 font-semibold text-[#0B57D0] hover:bg-[#f1f3f4] transition-colors">
+                            시간 추가
+                          </button>
+                        </div>
+                        <p className="mt-3 text-[14px] leading-5 text-[#5f6368]">
+                          반복 근무장소는 <button type="button" className="text-[#0B57D0] underline underline-offset-2">설정</button>에서 관리할 수 있습니다
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-4 mt-9">
+                      <ModalGlyph name="pin" className="mt-0.5" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[18px] leading-7 font-medium text-[#3c4043]">근무장소 선택</p>
+                        <div className="mt-4 flex flex-wrap gap-3">
+                          {([
+                            ["home", "재택"],
+                            ["office", "오피스"],
+                          ] as const).map(([value, label]) => {
+                            const selected = workingLocation === value;
+                            return (
+                              <button
+                                key={value}
+                                type="button"
+                                onClick={() => setWorkingLocation(value)}
+                                className={`h-12 px-5 rounded-full border flex items-center gap-3 text-[16px] leading-6 font-semibold transition-colors
+                                  ${selected ? "border-[#4396FB] bg-[#ECF5FF] text-[#0B57D0]" : "border-[#80868b] text-[#0B57D0] hover:bg-[#f1f3f4]"}`}>
+                                <WorkingLocationGlyph type={value} />
+                                <span>{label}</span>
+                              </button>
+                            );
+                          })}
+                          <button
+                            type="button"
+                            onClick={() => setWorkingLocation("other")}
+                            className={`h-12 px-5 rounded-full border flex items-center gap-3 text-[16px] leading-6 font-semibold transition-colors
+                              ${workingLocation === "other" ? "border-[#4396FB] bg-[#ECF5FF] text-[#0B57D0]" : "border-[#80868b] text-[#0B57D0] hover:bg-[#f1f3f4]"}`}>
+                            <span>다른 위치</span>
+                            <ChevronDown size={18} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-[16px] mx-4 mb-4 px-5 py-[14px]">
+                    <div className="flex items-center gap-3">
+                      <ModalGlyph name="calendar" />
+                      <div className="flex items-center gap-3">
+                        <span className="text-[16px] leading-6 font-medium text-[#3c4043]">윤소연</span>
+                        <span className="w-5 h-5 rounded-full bg-[#4396FB]" aria-hidden="true" />
+                      </div>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
               {/* Form card */}
               <div className="bg-white rounded-[16px] mx-4 mb-3 divide-y divide-[#f1f3f4] overflow-hidden">
 
@@ -2506,11 +2606,13 @@ export default function App() {
                   </div>
                 </div>
               </div>
+                </>
+              )}
 
               {/* Footer */}
               <div className="h-[76px] flex items-center justify-end gap-3 px-5 pt-4 pb-5">
                 <button onClick={() => setPopupOpen(false)} className="text-[14px] leading-5 text-[#4396FB] font-medium hover:underline">옵션 더보기</button>
-                <button onClick={handleSave} className="px-6 py-2.5 rounded-full bg-[#4396FB] text-white text-[14px] leading-5 font-semibold hover:bg-[#2F7FE6] transition-colors shadow-[0px_1px_1.5px_rgba(0,0,0,0.1),0px_1px_1px_rgba(0,0,0,0.1)]">저장</button>
+                <button onClick={activeTab === "근무장소 설정" ? handleSaveWorkingLocation : handleSave} className="px-6 py-2.5 rounded-full bg-[#4396FB] text-white text-[14px] leading-5 font-semibold hover:bg-[#2F7FE6] transition-colors shadow-[0px_1px_1.5px_rgba(0,0,0,0.1),0px_1px_1px_rgba(0,0,0,0.1)]">저장</button>
               </div>
             </motion.div>
           </motion.div>
