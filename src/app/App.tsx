@@ -222,10 +222,14 @@ function WorkingLocationGlyph({ type, className = "w-5 h-5 shrink-0" }: { type: 
 function OutOfOfficeChip({ person }: { person: { name: string; avatarColor: string } }) {
   return (
     <div
-      className="h-[19.5px] w-full flex items-center gap-[6px] overflow-hidden px-2 py-[3px] rounded-[4px] text-[9px] leading-[13.5px] font-semibold mb-0.5"
+      className="h-[19.5px] w-full flex items-center gap-[5px] overflow-hidden px-[6px] py-[3px] rounded-[4px] text-[9px] leading-[13.5px] font-semibold mb-0.5"
       style={{ backgroundColor: person.avatarColor + "21", color: person.avatarColor }}>
-      <SuitcaseGlyph />
-      <span className="truncate">{person.name} 외근</span>
+      <span
+        className="w-3.5 h-3.5 rounded-full flex items-center justify-center shrink-0"
+        style={{ backgroundColor: person.avatarColor + "18" }}>
+        <SuitcaseGlyph />
+      </span>
+      <span className="truncate">외근</span>
     </div>
   );
 }
