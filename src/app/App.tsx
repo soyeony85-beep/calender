@@ -191,6 +191,17 @@ function MeetingAvoidGlyph({ type }: { type: "lunch" | "home" }) {
   );
 }
 
+function RoomResourceGlyph({ className = "w-6 h-6 shrink-0" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <path d="M5.25 3.25h9.5v17.5h-9.5V3.25Z" stroke="#4E5968" strokeWidth="1.8" />
+      <path d="M14.75 8.25h4v12.5h-4" stroke="#4E5968" strokeWidth="1.8" />
+      <path d="M8.1 8.1h3.2M8.1 11.9h3.2M8.1 15.7h3.2" stroke="#4E5968" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M3.75 20.75h16.5" stroke="#4E5968" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 function OutOfOfficeChip({ person }: { person: { name: string; avatarColor: string } }) {
   return (
     <div
@@ -659,6 +670,8 @@ export default function App() {
   const [showEndPicker, setShowEndPicker] = useState(false);
   const [showRepeatPicker, setShowRepeatPicker] = useState(false);
   const [locationMode, setLocationMode] = useState<"none" | "room" | "location">("none");
+  const [roomVal, setRoomVal] = useState("");
+  const [roomSearch, setRoomSearch] = useState("");
   const [locationVal, setLocationVal] = useState("");
   const [descriptionVal, setDescriptionVal] = useState("");
 
@@ -680,6 +693,11 @@ export default function App() {
   const [newTypeOptionalRoles, setNewTypeOptionalRoles] = useState<string[]>([]);
 
   const PROJECT_COLORS = ["#4396FB","#3182F6","#00C3B2","#8B5CF6","#ea4335","#fbbc04","#34a853","#FF6B6B"];
+  const ROOM_OPTIONS = [
+    { id: "rd-center", name: "R&D Center", building: "HQ", floor: "B1F", capacity: 6 },
+    { id: "moon-cake", name: "Moon Cake", building: "HQ", floor: "B1F", capacity: 6 },
+    { id: "sprint-room", name: "Sprint Room", building: "HQ", floor: "5F", capacity: 8 },
+  ];
 
   function parsePersonInput(raw: string, fallbackIndex: number) {
     const normalized = raw.trim().replace(/[,/]+/g, " ").replace(/\s+/g, " ");
@@ -883,7 +901,7 @@ export default function App() {
 
   function openPopup(date: Date, hour: number) {
     setPopupDate(date); setStartH(hour); setStartM(0); setEndH(hour + 1); setEndM(0);
-    setPopupTitle(""); setProjectId(null); setMeetingTypeId(null); setLocationVal(""); setDescriptionVal("");
+    setPopupTitle(""); setProjectId(null); setMeetingTypeId(null); setRoomVal(""); setRoomSearch(""); setLocationVal(""); setDescriptionVal("");
     setLocationMode("none");
     setIsAllDay(false); setRepeatVal("반복 안 함"); setActiveTab("일정");
     setShowDatePicker(false); setShowStartPicker(false); setShowEndPicker(false); setShowRepeatPicker(false);
@@ -897,6 +915,7 @@ export default function App() {
     const isUrgent = meetingTypeId === "urgent";
     const title = popupTitle.trim() || (isUrgent ? "긴급 회의" : "새 회의");
     const duration = Math.max(0.5, (endH + endM / 60) - (startH + startM / 60));
+    const meetingLocation = [roomVal, locationVal].map(value => value.trim()).filter(Boolean).join(" · ");
 
     // Build participant list: organizer + project members (required + optional)
     const participants: { id: number; color: string }[] = [
@@ -922,7 +941,7 @@ export default function App() {
         personId: p.id,
         urgent: isUrgent,
         pendingInvite: p.id !== ORGANIZER.id,
-        location: locationVal,
+        location: meetingLocation,
         description: descriptionVal,
       })),
     ]);
@@ -2353,35 +2372,115 @@ export default function App() {
                   <span className="text-[14px] leading-5 font-normal text-[#9aa0a6] whitespace-nowrap">Google Meet 화상 회의 추가</span>
                 </div>
 
-                {/* Location */}
-                <div className="flex items-center gap-4 px-5 pt-[14px] pb-[15px]">
-                  <ModalGlyph name="pin" />
-                  {locationMode === "none" && !locationVal ? (
-                    <div className="flex-1 text-[14px] leading-5 font-normal text-[#9aa0a6]">
-                      <button
-                        type="button"
-                        onClick={() => setLocationMode("room")}
-                        className="text-[14px] leading-5 font-normal underline underline-offset-[3px] decoration-[#9aa0a6] hover:text-[#4396FB] hover:decoration-[#4396FB] transition-colors">
-                        회의실
-                      </button>
-                      <span className="text-[14px] leading-5 font-normal"> 또는 </span>
+                {/* Room and location */}
+                <div className="px-5 pt-[14px] pb-[15px] space-y-3">
+                  {locationMode === "room" ? (
+                    <div className="flex items-start gap-4">
+                      <RoomResourceGlyph />
+                      <div className="flex-1 min-w-0">
+                        <div className="h-10 rounded-[8px] bg-[#E9EDF2] border-b-4 border-[#1A73E8] flex items-center gap-3 px-3">
+                          <Search size={20} className="text-[#4E5968] shrink-0" strokeWidth={2.2} />
+                          <input
+                            autoFocus
+                            value={roomSearch}
+                            onChange={e => setRoomSearch(e.target.value)}
+                            placeholder="Search room or resource"
+                            className="flex-1 bg-transparent outline-none text-[16px] leading-6 text-[#202124] placeholder-[#4E5968]" />
+                          {(roomSearch || roomVal) && (
+                            <button
+                              type="button"
+                              onClick={() => { setRoomSearch(""); setRoomVal(""); }}
+                              className="w-7 h-7 rounded-full hover:bg-[#dfe3ea] flex items-center justify-center"
+                              aria-label="회의실 검색 지우기">
+                              <X size={21} className="text-[#4E5968]" />
+                            </button>
+                          )}
+                        </div>
+
+                        <div className="pt-6">
+                          <div className="flex items-center justify-between mb-3">
+                            <p className="text-[16px] leading-6 font-semibold text-[#202124]">Frequently used</p>
+                            <ChevronDown size={18} className="text-[#202124] rotate-180" />
+                          </div>
+                          <div className="space-y-3">
+                            {ROOM_OPTIONS
+                              .filter(room => `${room.name} ${room.building} ${room.floor}`.toLowerCase().includes(roomSearch.trim().toLowerCase()))
+                              .map(room => {
+                                const roomLabel = `${room.name}  ${room.building}  ${room.floor}`;
+                                const selected = roomVal === roomLabel;
+                                return (
+                                  <button
+                                    key={room.id}
+                                    type="button"
+                                    onClick={() => setRoomVal(roomLabel)}
+                                    className={`w-full flex items-start gap-3 rounded-[8px] px-2 py-2 text-left transition-colors ${selected ? "bg-[#ECF5FF]" : "hover:bg-[#f1f3f4]"}`}>
+                                    <RoomResourceGlyph className="w-5 h-5 shrink-0 mt-0.5" />
+                                    <div className="min-w-0 flex-1">
+                                      <p className="text-[15px] leading-5 font-normal text-[#202124] truncate">{roomLabel}</p>
+                                      <div className="flex items-center gap-1 mt-1 text-[#4E5968]">
+                                        <ModalGlyph name="people" className="w-[18px] h-[18px]" />
+                                        <span className="text-[13px] leading-5">{room.capacity}</span>
+                                      </div>
+                                    </div>
+                                    {selected && <Check size={18} className="text-[#4396FB] mt-0.5" strokeWidth={2.6} />}
+                                  </button>
+                                );
+                              })}
+                          </div>
+
+                          <div className="border-t border-[#D0D5DA] mt-4 pt-4">
+                            <button
+                              type="button"
+                              onClick={() => setRoomVal("")}
+                              className="flex items-center gap-3 text-left">
+                              <span className="text-[14px] leading-5 font-semibold text-[#202124]">No room allocated</span>
+                              <span className="h-8 px-3 rounded-full border border-[#C0C7D1] flex items-center gap-1 text-[13px] text-[#4E5968]">
+                                <ModalGlyph name="people" className="w-[17px] h-[17px]" /> 1 <ChevronDown size={15} />
+                              </span>
+                            </button>
+                            <button
+                              type="button"
+                              className="mt-5 text-[16px] leading-6 font-normal text-[#0B57D0] hover:underline">
+                              Browse all rooms & resources
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-4">
+                      <RoomResourceGlyph />
+                      <div className="flex-1 text-[14px] leading-5 font-normal text-[#9aa0a6]">
+                        <button
+                          type="button"
+                          onClick={() => setLocationMode("room")}
+                          className="text-[14px] leading-5 font-normal underline underline-offset-[3px] decoration-[#9aa0a6] hover:text-[#4396FB] hover:decoration-[#4396FB] transition-colors">
+                          회의실
+                        </button>
+                        <span className="text-[14px] leading-5 font-normal"> 예약</span>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-4">
+                    <ModalGlyph name="pin" />
+                    {locationMode === "location" ? (
+                      <input
+                        autoFocus
+                        type="text"
+                        value={locationVal}
+                        onChange={e => setLocationVal(e.target.value)}
+                        placeholder="위치 설정"
+                        className="flex-1 text-[14px] leading-5 font-normal text-[#202124] bg-transparent outline-none placeholder-[#9aa0a6]" />
+                    ) : (
                       <button
                         type="button"
                         onClick={() => setLocationMode("location")}
-                        className="text-[14px] leading-5 font-normal underline underline-offset-[3px] decoration-[#9aa0a6] hover:text-[#4396FB] hover:decoration-[#4396FB] transition-colors">
-                        위치
+                        className="flex-1 text-left text-[14px] leading-5 font-normal text-[#9aa0a6] hover:text-[#4396FB] transition-colors">
+                        {locationVal || "위치 추가"}
                       </button>
-                      <span className="text-[14px] leading-5 font-normal"> 추가</span>
-                    </div>
-                  ) : (
-                    <input
-                      autoFocus
-                      type="text"
-                      value={locationVal}
-                      onChange={e => setLocationVal(e.target.value)}
-                      placeholder={locationMode === "room" ? "회의실 예약" : "위치 설정"}
-                      className="flex-1 text-[14px] leading-5 font-normal text-[#202124] bg-transparent outline-none placeholder-[#9aa0a6]" />
-                  )}
+                    )}
+                  </div>
                 </div>
 
                 {/* Description */}
