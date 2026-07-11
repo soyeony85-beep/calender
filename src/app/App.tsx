@@ -848,9 +848,11 @@ export default function App() {
     if (meetingTypeId === id) setMeetingTypeId(null);
   }
 
-  function setNewTypeRole(role: string, mode: "required" | "optional" | "none") {
-    setNewTypeRequiredRoles(prev => mode === "required" ? [...prev.filter(r => r !== role), role] : prev.filter(r => r !== role));
-    setNewTypeOptionalRoles(prev => mode === "optional" ? [...prev.filter(r => r !== role), role] : prev.filter(r => r !== role));
+  function setNewTypeRole(role: string, mode: "required" | "optional") {
+    const currentMode = newTypeRequiredRoles.includes(role) ? "required" : newTypeOptionalRoles.includes(role) ? "optional" : "none";
+    const nextMode = currentMode === mode ? "none" : mode;
+    setNewTypeRequiredRoles(prev => nextMode === "required" ? [...prev.filter(r => r !== role), role] : prev.filter(r => r !== role));
+    setNewTypeOptionalRoles(prev => nextMode === "optional" ? [...prev.filter(r => r !== role), role] : prev.filter(r => r !== role));
   }
 
   function closeAddMeetingType() {
@@ -2137,7 +2139,7 @@ export default function App() {
               ) : (
                 <>
               {/* Form card */}
-              <div className="bg-white rounded-[16px] mx-4 mb-3 divide-y divide-[#f1f3f4] overflow-hidden">
+              <div className="bg-white rounded-[16px] mx-4 mb-3 divide-y divide-[#e8eaed] overflow-hidden">
 
                 {/* ── Date/Time row ── */}
                 <div className="flex items-start gap-4 px-5 pt-4 pb-[17px]">
@@ -2290,18 +2292,18 @@ export default function App() {
                               </div>
 
                               {/* Search bar */}
-                              <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-white border border-[#e8eaed] focus-within:border-[#4396FB] mb-2 transition-colors">
-                                <Search size={12} className="text-[#9aa0a6] shrink-0" />
+                              <div className="h-9 rounded-[10px] bg-white border border-[#e8eaed] focus-within:border-[#4396FB] flex items-center gap-2.5 px-3 mb-2 transition-colors">
+                                <Search size={16} className="text-[#8A94A0] shrink-0" strokeWidth={2.1} />
                                 <input
                                   type="text"
                                   value={memberSearch}
                                   onChange={e => setMemberSearch(e.target.value)}
                                   placeholder="이름 또는 역할 검색"
-                                  className="flex-1 text-xs text-[#202124] placeholder-[#9aa0a6] bg-transparent outline-none"
+                                  className="flex-1 min-w-0 bg-transparent outline-none text-[14px] leading-5 font-normal text-[#202124] placeholder-[#9aa0a6]"
                                 />
                                 {memberSearch && (
-                                  <button onClick={() => setMemberSearch("")} className="w-4 h-4 rounded-full hover:bg-[#e8eaed] flex items-center justify-center">
-                                    <X size={10} className="text-[#9aa0a6]" />
+                                  <button onClick={() => setMemberSearch("")} className="w-6 h-6 rounded-full hover:bg-[#dfe3ea] flex items-center justify-center">
+                                    <X size={17} className="text-[#6B7683]" />
                                   </button>
                                 )}
                               </div>
@@ -2439,7 +2441,6 @@ export default function App() {
                                         {([
                                           ["required", "필수"],
                                           ["optional", "선택"],
-                                          ["none", "제외"],
                                         ] as const).map(([value, label]) => (
                                           <button key={value} type="button"
                                             onClick={() => setNewTypeRole(role, value)}
@@ -2498,7 +2499,7 @@ export default function App() {
 
                 {/* Schedule Preview — shown when project is selected */}
                 {projectId && (
-                  <div className="flex items-start gap-4 px-5 py-[14px] border-t border-[#f1f3f4]">
+                  <div className="flex items-start gap-4 px-5 py-[14px]">
                     <ModalGlyph name="calendar" className="mt-0.5" />
                     <div className="min-w-0 flex-1">
                       <button
@@ -2619,8 +2620,8 @@ export default function App() {
                                         key={room.id}
                                         type="button"
                                         onClick={() => setRoomVal(roomLabel)}
-                                        className={`w-full flex items-start gap-3 rounded-[8px] px-2 py-2 text-left transition-colors ${selected ? "bg-[#ECF5FF]" : "hover:bg-[#f1f3f4]"}`}>
-                                        <RoomResourceGlyph className="w-5 h-5 shrink-0 mt-0.5" />
+                                        className={`w-full flex items-center gap-3 rounded-[8px] px-2 py-2 text-left transition-colors ${selected ? "bg-[#ECF5FF]" : "hover:bg-[#f1f3f4]"}`}>
+                                        <RoomResourceGlyph className="w-5 h-5 shrink-0" />
                                         <div className="min-w-0 flex-1">
                                           <p className="text-[12px] leading-4 font-normal text-[#202124] truncate">{roomLabel}</p>
                                           <div className="flex items-center gap-1 mt-1 text-[#4E5968]">
@@ -2628,7 +2629,7 @@ export default function App() {
                                             <span className="text-[12px] leading-4">{room.capacity}</span>
                                           </div>
                                         </div>
-                                        {selected && <Check size={18} className="text-[#4396FB] mt-0.5" strokeWidth={2.6} />}
+                                        {selected && <Check size={18} className="shrink-0 text-[#4396FB]" strokeWidth={2.6} />}
                                       </button>
                                     );
                                   })}
@@ -2706,8 +2707,7 @@ export default function App() {
               )}
 
               {/* Footer */}
-              <div className="h-[76px] flex items-center justify-end gap-3 px-5 pt-4 pb-5">
-                <button onClick={() => setPopupOpen(false)} className="text-[14px] leading-5 text-[#4396FB] font-medium hover:underline">옵션 더보기</button>
+              <div className="h-[76px] flex items-center justify-end px-5 pt-4 pb-5">
                 <button onClick={activeTab === "근무장소 설정" ? handleSaveWorkingLocation : handleSave} className="px-6 py-2.5 rounded-full bg-[#4396FB] text-white text-[14px] leading-5 font-semibold hover:bg-[#2F7FE6] transition-colors shadow-[0px_1px_1.5px_rgba(0,0,0,0.1),0px_1px_1px_rgba(0,0,0,0.1)]">저장</button>
               </div>
             </motion.div>
