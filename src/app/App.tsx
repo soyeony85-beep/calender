@@ -215,19 +215,21 @@ function RoomResourceGlyph({ className = "w-6 h-6 shrink-0" }: { className?: str
   );
 }
 
-function WorkingLocationGlyph({ type, className = "w-5 h-5 shrink-0" }: { type: "home" | "office"; className?: string }) {
+function WorkingLocationGlyph({ type, className = "w-3 h-3 shrink-0" }: { type: "home" | "office"; className?: string }) {
   if (type === "home") {
     return (
-      <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-      <path d="M4 10.6 12 4l8 6.6v8.15c0 .69-.56 1.25-1.25 1.25H15v-5.2c0-.44-.36-.8-.8-.8h-4.4c-.44 0-.8.36-.8.8V20H5.25C4.56 20 4 19.44 4 18.75V10.6Z" fill="currentColor" />
+      <svg viewBox="0 0 12 12" fill="none" className={className} aria-hidden="true">
+        <path d="M5.3441 8.70264H6.6578C6.9512 8.70264 7.1891 8.94084 7.1891 9.23394V11.0789H4.8125V9.23394C4.8125 8.94054 5.0507 8.70264 5.3438 8.70264H5.3441Z" fill="#6B7683" />
+        <path d="M10.5349 4.38759L6.31119 1.02909C6.12909 0.884185 5.87109 0.884185 5.68869 1.02909L1.46559 4.38759C1.22709 4.57719 1.08789 4.86549 1.08789 5.17029V9.87938C1.08789 10.5421 1.62519 11.0794 2.28789 11.0794H5.00019V9.20289C5.00019 8.92689 5.22399 8.70279 5.50029 8.70279H6.50019C6.77619 8.70279 7.00029 8.92659 7.00029 9.20289V11.0794H9.71229C10.375 11.0794 10.9123 10.5421 10.9123 9.87938V5.17029C10.9123 4.86549 10.7737 4.57719 10.5349 4.38759Z" fill="#D0D5DA" />
+        <path d="M10.5349 4.38729L6.31149 1.02909C6.12939 0.884185 5.87139 0.884185 5.68929 1.02909L1.46559 4.38759C1.22709 4.57719 1.08789 4.86549 1.08789 5.17029V6.68799L5.68899 3.02919C5.87109 2.88429 6.12909 2.88429 6.31149 3.02919L10.9123 6.68799V5.17029C10.9123 4.86549 10.7731 4.57719 10.5346 4.38729H10.5349Z" fill="#007FF2" />
       </svg>
     );
   }
   return (
-    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-      <path d="M5 4.75C5 4.34 5.34 4 5.75 4h8.5c.41 0 .75.34.75.75V20H5V4.75Z" fill="currentColor" />
-      <path d="M15 9h3.25c.41 0 .75.34.75.75V20h-4V9Z" fill="currentColor" opacity=".78" />
-      <path d="M7.5 7h2v2h-2V7ZM11 7h2v2h-2V7ZM7.5 11h2v2h-2v-2ZM11 11h2v2h-2v-2ZM7.5 15h2v2h-2v-2ZM11 15h2v2h-2v-2Z" fill="white" opacity=".92" />
+    <svg viewBox="0 0 12 12" fill="none" className={className} aria-hidden="true">
+      <path d="M9.77049 1.15479H2.23029C1.90989 1.15479 1.65039 1.41459 1.65039 1.73469V10.2196C1.65039 10.5652 1.93059 10.8451 2.27589 10.8451H9.72459C10.0702 10.8451 10.3501 10.5649 10.3501 10.2196V1.73469C10.3501 1.41429 10.0906 1.15479 9.77049 1.15479Z" fill="#D0D5DA" />
+      <path d="M5.56825 9.28125H6.43285C6.62575 9.28125 6.78265 9.43785 6.78265 9.63105V10.8455H5.21875V9.63105C5.21875 9.43815 5.37505 9.28125 5.56825 9.28125Z" fill="#6B7683" />
+      <path d="M4.40486 7.31636C4.40486 7.39646 4.34006 7.46126 4.25996 7.46126H3.68006C3.59996 7.46126 3.53516 7.39646 3.53516 7.31636V6.73646C3.53516 6.65636 3.59996 6.59156 3.68006 6.59156H4.25996C4.34006 6.59156 4.40486 6.65636 4.40486 6.73646V7.31636ZM4.40486 5.28626C4.40486 5.36636 4.34006 5.43116 4.25996 5.43116H3.68006C3.59996 5.43116 3.53516 5.36636 3.53516 5.28626V4.70636C3.53516 4.62626 3.59996 4.56146 3.68006 4.56146H4.25996C4.34006 4.56146 4.40486 4.62626 4.40486 4.70636V5.28626ZM4.40486 3.25616C4.40486 3.33626 4.34006 3.40106 4.25996 3.40106H3.68006C3.59996 3.40106 3.53516 3.33626 3.53516 3.25616V2.67626C3.53516 2.59616 3.59996 2.53136 3.68006 2.53136H4.25996C4.34006 2.53136 4.40486 2.59616 4.40486 2.67626V3.25616ZM6.43496 7.31606C6.43496 7.39616 6.37016 7.46096 6.29006 7.46096H5.71016C5.63006 7.46096 5.56526 7.39616 5.56526 7.31606V6.73616C5.56526 6.65606 5.63006 6.59126 5.71016 6.59126H6.29006C6.37016 6.59126 6.43496 6.65606 6.43496 6.73616V7.31606ZM6.43496 5.28596C6.43496 5.36606 6.37016 5.43086 6.29006 5.43086H5.71016C5.63006 5.43086 5.56526 5.36606 5.56526 5.28596V4.70606C5.56526 4.62596 5.63006 4.56116 5.71016 4.56116H6.29006C6.37016 4.56116 6.43496 4.62596 6.43496 4.70606V5.28596ZM6.43496 3.25586C6.43496 3.33596 6.37016 3.40076 6.29006 3.40076H5.71016C5.63006 3.40076 5.56526 3.33596 5.56526 3.25586V2.67596C5.56526 2.59586 5.63006 2.53106 5.71016 2.53106H6.29006C6.37016 2.53106 6.43496 2.59586 6.43496 2.67596V3.25586ZM8.46506 7.31576C8.46506 7.39586 8.40026 7.46066 8.32016 7.46066H7.74026C7.66016 7.46066 7.59536 7.39586 7.59536 7.31576V6.73586C7.59536 6.65576 7.66016 6.59096 7.74026 6.59096H8.32016C8.40026 6.59096 8.46506 6.65576 8.46506 6.73586V7.31576ZM8.46506 5.28566C8.46506 5.36576 8.40026 5.43056 8.32016 5.43056H7.74026C7.66016 5.43056 7.59536 5.36576 7.59536 5.28566V4.70576C7.59536 4.62566 7.66016 4.56086 7.74026 4.56086H8.32016C8.40026 4.56086 8.46506 4.62566 8.46506 4.70576V5.28566ZM8.46506 3.25556C8.46506 3.33566 8.40026 3.40046 8.32016 3.40046H7.74026C7.66016 3.40046 7.59536 3.33566 7.59536 3.25556V2.67566C7.59536 2.59556 7.66016 2.53076 7.74026 2.53076H8.32016C8.40026 2.53076 8.46506 2.59556 8.46506 2.67566V3.25556Z" fill="#8A94A0" />
     </svg>
   );
 }
@@ -688,7 +690,10 @@ export default function App() {
   const [cancelledMeetingDates, setCancelledMeetingDates] = useState<string[]>([]);
   const [miniCalMonth, setMiniCalMonth] = useState(new Date(2026, 6, 1));
   const [addCalOpen, setAddCalOpen] = useState(false);
+  const [myCalendarExpanded, setMyCalendarExpanded] = useState(true);
+  const [teamCalendarsExpanded, setTeamCalendarsExpanded] = useState(true);
   const [addCalInput, setAddCalInput] = useState("");
+  const teamCalendarSectionRef = useRef<HTMLDivElement>(null);
   const addCalendarLockRef = useRef<string | null>(null);
   const [visiblePersonIds, setVisiblePersonIds] = useState<number[]>([ORGANIZER.id, ...PEOPLE.map(p => p.id)]);
   const [teamColorMenuId, setTeamColorMenuId] = useState<number | null>(null);
@@ -1063,6 +1068,17 @@ export default function App() {
     return () => document.removeEventListener("mousedown", handler);
   }, [showMyMenu]);
 
+  useEffect(() => {
+    if (!addCalOpen) return;
+    const closeAddCalendarOnOutsideClick = (event: MouseEvent) => {
+      if (teamCalendarSectionRef.current?.contains(event.target as Node)) return;
+      setAddCalOpen(false);
+      setAddCalInput("");
+    };
+    document.addEventListener("mousedown", closeAddCalendarOnOutsideClick);
+    return () => document.removeEventListener("mousedown", closeAddCalendarOnOutsideClick);
+  }, [addCalOpen]);
+
   function sameDate(a: Date, b: Date) {
     return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
   }
@@ -1355,7 +1371,7 @@ export default function App() {
       <header className="h-16 bg-white border-b border-[#e8eaed] flex items-center px-4 gap-3 shrink-0 z-30">
         <div className="flex items-center gap-2.5">
           <div className="w-9 h-9 flex items-center justify-center">
-            <img src="/figma-calendar-logo.png" alt="" className="w-9 h-9 object-contain" />
+            <img src="/figma-calendar-logo.png" alt="캘린더" width={36} height={36} draggable={false} className="block w-9 h-9 object-contain" />
           </div>
           <span className="text-[18px] leading-7 font-semibold text-[#202124]">캘린더</span>
         </div>
@@ -1456,12 +1472,12 @@ export default function App() {
           <div className="px-3 py-1">
             <div className="flex items-center justify-between px-2 py-[6px]">
               <span className="text-[11px] leading-[16.5px] font-semibold text-[#5f6368] uppercase tracking-[0.275px]">내 캘린더</span>
-              <button className="w-5 h-5 rounded-full hover:bg-[#e8eaed] flex items-center justify-center" aria-label="내 캘린더 접기">
-                <ChevronLeft size={13} className="text-[#5f6368] -rotate-90" strokeWidth={1.9} />
+              <button onClick={() => setMyCalendarExpanded(v => !v)} className="w-5 h-5 rounded-full hover:bg-[#e8eaed] flex items-center justify-center" aria-label="내 캘린더 접기">
+                <ChevronLeft size={13} className={`text-[#5f6368] transition-transform ${myCalendarExpanded ? "-rotate-90" : "rotate-180"}`} strokeWidth={1.9} />
               </button>
             </div>
             {/* 윤소연 row + ... menu */}
-            <div className="pt-[2px]">
+            {myCalendarExpanded && <div className="pt-[2px]">
               <div className="relative px-3 py-2 rounded-[14px] hover:bg-[#f1f3f4] cursor-pointer transition-colors group">
                 <div className="w-[207px] flex items-center gap-2.5">
                   <button
@@ -1507,16 +1523,19 @@ export default function App() {
                 )}
               </AnimatePresence>
               </div>
-            </div>
+            </div>}
           </div>
           <div className="mx-4 h-px bg-[#e8eaed] my-2" />
-          <div className="px-3 py-1">
+          <div ref={teamCalendarSectionRef} className="px-3 py-1">
             <div className="flex items-center justify-between px-2 py-[6px]">
               <span className="text-[11px] leading-[16.5px] font-semibold text-[#5f6368] uppercase tracking-[0.275px]">다른 팀원 캘린더</span>
-              <button onClick={() => setAddCalOpen(v => !v)} className="w-5 h-5 rounded-full hover:bg-[#e8eaed] flex items-center justify-center"><Plus size={13} className="text-[#5f6368]" /></button>
+              <div className="flex items-center gap-0.5">
+                <button onClick={() => setAddCalOpen(v => !v)} className="w-5 h-5 rounded-full hover:bg-[#e8eaed] flex items-center justify-center" aria-label="다른 팀원 캘린더 추가"><Plus size={13} className="text-[#5f6368]" /></button>
+                <button onClick={() => setTeamCalendarsExpanded(v => !v)} className="w-5 h-5 rounded-full hover:bg-[#e8eaed] flex items-center justify-center" aria-label="다른 팀원 캘린더 접기"><ChevronLeft size={13} className={`text-[#5f6368] transition-transform ${teamCalendarsExpanded ? "-rotate-90" : "rotate-180"}`} strokeWidth={1.9} /></button>
+              </div>
             </div>
             <AnimatePresence>
-              {addCalOpen && (
+              {addCalOpen && teamCalendarsExpanded && (
                 <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="px-2 pb-1 overflow-hidden">
                   <div className="flex items-center gap-1.5">
                     <input autoFocus type="text" value={addCalInput} onChange={e => setAddCalInput(e.target.value)}
@@ -1533,7 +1552,7 @@ export default function App() {
                 </motion.div>
               )}
             </AnimatePresence>
-            {allPeople.map(person => (
+            {teamCalendarsExpanded && allPeople.map(person => (
               <div key={person.id} className="pt-[2px]">
                 <div className="group relative px-3 py-2 rounded-[14px] hover:bg-[#e8edf5] cursor-pointer transition-colors">
                   <div className="w-[207px] flex items-center gap-2.5">
@@ -1618,8 +1637,8 @@ export default function App() {
                   );
                 })}
               </div>
-              <div className="min-h-[55px] flex items-stretch border-b border-[#e8eaed] bg-white shrink-0">
-                <div className="w-16 min-h-[55px] shrink-0 flex items-center justify-end pr-2"><span className="text-[9px] leading-[13.5px] text-[#c5c7c5] font-medium">종일</span></div>
+              <div className="min-h-[35px] flex items-stretch border-b border-[#e8eaed] bg-white shrink-0">
+                <div className="w-16 min-h-[35px] shrink-0 flex items-center justify-end pr-2"><span className="text-[9px] leading-[13.5px] text-[#c5c7c5] font-medium">종일</span></div>
                 {weekDays.map((day, idx) => {
                   // dayOfWeek: 0=Sun,1=Mon,...,6=Sat → map to 1-based Mon-Fri
                   const dw = day.getDay(); // 1=Mon…5=Fri
@@ -1629,12 +1648,12 @@ export default function App() {
                     ...(dw === 4 ? OOO_THURSDAY.map(p => personById(p.id)).filter(p => isPersonVisible(p.id)) : []),
                   ];
                   return (
-                    <div key={idx} className="flex-1 min-h-[55px] border-l border-[#e8eaed] pl-[5px] pr-1 py-1.5 overflow-visible">
+                    <div key={idx} className="flex-1 min-h-[35px] border-l border-[#e8eaed] pl-[5px] pr-1 py-1.5 overflow-visible">
                       <OutOfOfficeChip people={oooPeople} />
                       {myWorkLocation && (
                         <div className="mt-1 min-h-6 flex items-center gap-1.5 text-[10px] leading-[15px] font-semibold text-[#4E5968]">
                           <span className="w-6 h-6 rounded-[7px] bg-[#4396FB24] flex items-center justify-center">
-                            {myWorkLocation === "외근" ? <OffsiteCarGlyph /> : <span>{myWorkLocation === "오피스" ? "🏢" : myWorkLocation === "집" ? "🏠" : "🏝️"}</span>}
+                            {myWorkLocation === "외근" ? <OffsiteCarGlyph /> : myWorkLocation === "오피스" ? <WorkingLocationGlyph type="office" /> : myWorkLocation === "집" ? <WorkingLocationGlyph type="home" /> : <span>🏝️</span>}
                           </span>
                           <span>{myWorkLocation}</span>
                         </div>
@@ -1681,6 +1700,14 @@ export default function App() {
                                   const pendingInvite = (ev as { pendingInvite?: boolean }).pendingInvite;
                                   const canDrag = isOwnEvent(ev);
                                   const isLocationRail = Boolean(ev.workLocationType);
+                                  const locationPastel = ev.workLocationType === "home" ? "#EAF7F0"
+                                    : ev.workLocationType === "other" ? "#FFF4E5"
+                                    : ev.workLocationType === "vacation" ? "#F6F7E3"
+                                    : "#EAF4FF";
+                                  const locationAccent = ev.workLocationType === "home" ? "#CFEBDD"
+                                    : ev.workLocationType === "other" ? "#FFE5BD"
+                                    : ev.workLocationType === "vacation" ? "#E8EBB8"
+                                    : "#CFE6FF";
                                   const regularIndex = regularEvents.findIndex(item => item.id === ev.id);
                                   const overlapColumns = hasWorkLocationOverlap ? Math.max(1, regularEvents.length) : ev.columns;
                                   const totalMargin = (hasWorkLocationOverlap ? 29 : 6) + (overlapColumns - 1) * GAP;
@@ -1712,17 +1739,17 @@ export default function App() {
                                         left: leftCalc,
                                         width: widthCalc,
                                         height: `${ev.duration * 64 - 4}px`,
-                                        backgroundColor: isLocationRail ? "transparent" : ev.workLocationType ? "#fff" : pendingInvite ? "#fff" : bg,
+                                        backgroundColor: isLocationRail ? locationPastel : ev.workLocationType ? locationPastel : pendingInvite ? "#fff" : bg,
                                         border: pendingInvite ? `1.5px dashed ${ev.color}55` : undefined,
                                         borderLeft: !isLocationRail && ev.workLocationType ? "3px solid #D9F1FF" : undefined,
-                                        padding: isLocationRail ? "1px 0" : overlapColumns >= 5 ? "6px 5px" : pendingInvite ? "7.5px 8.5px" : "6px 7px",
+                                        padding: isLocationRail ? "4px" : overlapColumns >= 5 ? "6px 5px" : pendingInvite ? "7.5px 8.5px" : "6px 7px",
                                       }}>
-                                      {isLocationRail && <span className="absolute left-0 top-[17px] bottom-0 w-[5px] rounded-[2px]" style={{ backgroundColor: `${ORGANIZER.avatarColor}2E` }} />}
+                                      {isLocationRail && <span className="absolute left-px top-5 bottom-0 w-1 rounded-[2px]" style={{ backgroundColor: locationAccent }} />}
                                       <div className="flex items-center gap-1 min-w-0">
                                         {meetingsCancelled && <X size={11} className="text-[#EA4335] shrink-0" strokeWidth={2.8} />}
                                         {(ev as { urgent?: boolean }).urgent && <img src={EMERGENCY_ICON} alt="" className="w-3 h-3 shrink-0" draggable={false} />}
                                         {ev.workLocationType && (
-                                          <span className={`${isLocationRail ? "w-5 h-5" : "w-5 h-5 -ml-1"} rounded-[4px] text-[#1888E9] flex items-center justify-center shrink-0`} style={{ backgroundColor: `${ORGANIZER.avatarColor}24` }}>
+                                          <span className={`${isLocationRail ? "w-3 h-3" : "w-5 h-5 -ml-1"} rounded-[4px] text-[#1888E9] flex items-center justify-center shrink-0`} style={{ backgroundColor: locationPastel }}>
                                             {ev.workLocationType === "office" ? <WorkingLocationGlyph type="office" className="w-3 h-3" /> : ev.workLocationType === "home" ? <WorkingLocationGlyph type="home" className="w-3 h-3" /> : ev.workLocationType === "other" ? <OffsiteCarGlyph /> : <span className="text-[10px]">🏝️</span>}
                                           </span>
                                         )}
@@ -2118,14 +2145,14 @@ export default function App() {
                           </div>}
                           <button onClick={() => setWorkLocationMenuDay(v => v === dayNum ? null : dayNum)}
                             className="h-8 min-w-[103px] px-3 rounded-[10px] bg-[#f1f3f4] flex items-center gap-2 text-sm leading-5 font-medium text-[#5f6368] whitespace-nowrap">
-                            <span className="w-3 h-3 flex items-center justify-center text-[11px]">{workLocations[dayNum] === "오피스" ? "🏢" : workLocations[dayNum] === "외근" ? <OffsiteCarGlyph /> : workLocations[dayNum] === "집" ? "🏠" : "🏝️"}</span>
+                            <span className="w-3 h-3 flex items-center justify-center text-[11px]">{workLocations[dayNum] === "오피스" ? <WorkingLocationGlyph type="office" /> : workLocations[dayNum] === "외근" ? <OffsiteCarGlyph /> : workLocations[dayNum] === "집" ? <WorkingLocationGlyph type="home" /> : "🏝️"}</span>
                             <span>{workLocations[dayNum]}</span><ChevronDown size={14} className="ml-auto" />
                           </button>
                           {workLocationMenuDay === dayNum && (
                             <div className={`absolute z-20 w-[130px] max-h-[168px] overflow-y-auto rounded-[10px] border border-[#e8eaed] bg-white py-1 shadow-xl ${applyWorkHours ? "left-[252px]" : "left-[53px]"} ${dayNum >= 4 ? "bottom-9" : "top-9"}`}>
                               {["오피스", "외근", "집"].map(location => (
                                 <button key={location} onClick={() => { setWorkLocations(v => v.map((x, n) => n === dayNum ? location : x)); setWorkLocationMenuDay(null); }} className="w-full px-3 py-2 flex items-center gap-2 text-sm text-[#5f6368] hover:bg-[#f1f3f4]">
-                                  <span className="w-3 flex justify-center">{location === "오피스" ? "🏢" : location === "외근" ? <OffsiteCarGlyph /> : location === "집" ? "🏠" : "🏝️"}</span>{location}
+                                  <span className="w-3 flex justify-center">{location === "오피스" ? <WorkingLocationGlyph type="office" /> : location === "외근" ? <OffsiteCarGlyph /> : location === "집" ? <WorkingLocationGlyph type="home" /> : "🏝️"}</span>{location}
                                 </button>
                               ))}
                             </div>
@@ -2618,7 +2645,7 @@ export default function App() {
                       <button
                         type="button"
                         onClick={() => setSchedulePreviewExpanded(prev => !prev)}
-                        className="w-full relative flex items-start justify-center gap-3 text-center">
+                        className="w-full flex items-start justify-between gap-3 text-left">
                         <div className="min-w-0">
                           <p className="text-[14px] leading-5 font-semibold text-[#202124]">
                             참석자 스케줄
@@ -2627,7 +2654,7 @@ export default function App() {
                             {fmtDateShort(popupDate)}의 참석자 일정을 확인해요
                           </p>
                         </div>
-                        <ChevronDown size={18} className={`absolute right-0 mt-0.5 shrink-0 text-[#4E5968] transition-transform ${schedulePreviewExpanded ? "rotate-180" : ""}`} />
+                        <ChevronDown size={18} className={`mt-0.5 shrink-0 text-[#4E5968] transition-transform ${schedulePreviewExpanded ? "rotate-180" : ""}`} />
                       </button>
                       <AnimatePresence initial={false}>
                         {schedulePreviewExpanded && (
@@ -2663,8 +2690,9 @@ export default function App() {
                                   });
                                 });
                                 if (conflicts.length === 0) return (
-                                  <p className="text-[10px] text-[#34a853] mt-2 flex items-center gap-1 font-medium">
-                                    <Check size={10} strokeWidth={3} /> 모든 참석자가 가능한 시간입니다
+                                  <p className="pt-3 flex items-center gap-1 text-[10px] leading-[15px] font-medium text-[#00BD79]">
+                                    <span className="w-3 h-3 rounded-full bg-[#00BD79] text-white flex items-center justify-center shrink-0"><Check size={8} strokeWidth={3} /></span>
+                                    <span className="w-[153px]">모든 참석자가 참여 가능한 시간입니다.</span>
                                   </p>
                                 );
                                 return (
