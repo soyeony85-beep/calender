@@ -684,6 +684,8 @@ export default function App() {
   const [draggingEvent, setDraggingEvent] = useState<DragEventRef | null>(null);
   const [detailEvent, setDetailEvent] = useState<CalendarEventDetail | null>(null);
   const [moveBlockedNotice, setMoveBlockedNotice] = useState(false);
+  const [allDayVacationDates, setAllDayVacationDates] = useState<string[]>([]);
+  const [cancelledMeetingDates, setCancelledMeetingDates] = useState<string[]>([]);
   const [miniCalMonth, setMiniCalMonth] = useState(new Date(2026, 6, 1));
   const [addCalOpen, setAddCalOpen] = useState(false);
   const [addCalInput, setAddCalInput] = useState("");
@@ -1038,10 +1040,13 @@ export default function App() {
         location: label,
         workLocationType: workingLocation,
       }]);
+    } else if (workingLocation === "vacation") {
+      const key = localDateKey(popupDate);
+      setAllDayVacationDates(prev => prev.includes(key) ? prev : [...prev, key]);
     }
     setMyPrefs(prev => ({
       ...prev,
-      oooDays: workingLocation === "other"
+      oooDays: isAllDay && workingLocation === "other"
         ? Array.from(new Set([...prev.oooDays, popupDate.getDay()])).filter(day => day >= 1 && day <= 5)
         : prev.oooDays,
     }));
@@ -1059,6 +1064,10 @@ export default function App() {
 
   function sameDate(a: Date, b: Date) {
     return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  }
+
+  function localDateKey(date: Date) {
+    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   }
   function isToday(d: Date) { return sameDate(d, today); }
   function startOfWeek(d: Date) {
@@ -1639,13 +1648,16 @@ export default function App() {
                     {weekDays.map((day, dayIdx) => {
                       const isWknd = day.getDay() === 0 || day.getDay() === 6;
                       const isLunch = hour === 13;
+                      const isVacationDay = allDayVacationDates.includes(localDateKey(day));
+                      const meetingsCancelled = cancelledMeetingDates.includes(localDateKey(day));
                       const evs = layoutEventsForDay(dayIdx).filter(e => Math.floor(e.startHour) === hour);
                       return (
                         <div key={dayIdx}
                           onClick={() => !isWknd && !draggingEvent && openPopup(day, hour)}
                           onDragOver={e => { if (!isWknd && draggingEvent) e.preventDefault(); }}
                           onDrop={e => { e.preventDefault(); e.stopPropagation(); if (!isWknd) moveDraggedEvent(dayIdx, hour); }}
-                          className={`flex-1 border-l border-t border-[#e8eaed] relative transition-colors bg-white ${isWknd ? "cursor-default" : "cursor-pointer group hover:bg-[#f8f9fa]"}`}>
+                          className={`flex-1 border-l border-t border-[#e8eaed] relative transition-colors ${isWknd ? "cursor-default" : "cursor-pointer group"}`}
+                          style={{ backgroundColor: isVacationDay ? `${ORGANIZER.avatarColor}1C` : "#fff" }}>
 
                           {/* Events — side by side with small gap */}
                           {(() => {
@@ -1692,13 +1704,14 @@ export default function App() {
                                         padding: ev.columns >= 5 ? "6px 5px" : pendingInvite ? "7.5px 8.5px" : "6px 7px",
                                       }}>
                                       <div className="flex items-center gap-1 min-w-0">
+                                        {meetingsCancelled && <X size={11} className="text-[#EA4335] shrink-0" strokeWidth={2.8} />}
                                         {(ev as { urgent?: boolean }).urgent && <img src={EMERGENCY_ICON} alt="" className="w-3 h-3 shrink-0" draggable={false} />}
                                         {ev.workLocationType && (
                                           <span className="w-5 h-5 -ml-1 rounded-full bg-[#E5F6FF] text-[#18A8E8] flex items-center justify-center shrink-0">
                                             {ev.workLocationType === "office" ? <WorkingLocationGlyph type="office" className="w-3 h-3" /> : ev.workLocationType === "home" ? <WorkingLocationGlyph type="home" className="w-3 h-3" /> : ev.workLocationType === "other" ? <OffsiteCarGlyph /> : <span className="text-[10px]">🏝️</span>}
                                           </span>
                                         )}
-                                        <p className="text-[10px] font-semibold leading-[12.5px] truncate"
+                                        <p className={`text-[10px] font-semibold leading-[12.5px] truncate ${meetingsCancelled ? "line-through opacity-55" : ""}`}
                                           style={{ color: text }}>{ev.title}</p>
                                       </div>
                                       {ev.duration >= 1 && (
@@ -2094,7 +2107,7 @@ export default function App() {
                           </button>
                           {workLocationMenuDay === dayNum && (
                             <div className={`absolute z-20 w-[130px] max-h-[168px] overflow-y-auto rounded-[10px] border border-[#e8eaed] bg-white py-1 shadow-xl ${applyWorkHours ? "left-[252px]" : "left-[53px]"} ${dayNum >= 4 ? "bottom-9" : "top-9"}`}>
-                              {["오피스", "외근", "집", "휴가"].map(location => (
+                              {["오피스", "외근", "집"].map(location => (
                                 <button key={location} onClick={() => { setWorkLocations(v => v.map((x, n) => n === dayNum ? location : x)); setWorkLocationMenuDay(null); }} className="w-full px-3 py-2 flex items-center gap-2 text-sm text-[#5f6368] hover:bg-[#f1f3f4]">
                                   <span className="w-3 flex justify-center">{location === "오피스" ? "🏢" : location === "외근" ? <OffsiteCarGlyph /> : location === "집" ? "🏠" : "🏝️"}</span>{location}
                                 </button>
@@ -2151,7 +2164,7 @@ export default function App() {
 
               {/* Title */}
               <div className="h-[61px] px-6">
-                <input type="text" value={popupTitle} onChange={e => setPopupTitle(e.target.value)} placeholder="회의" autoFocus
+                <input type="text" value={popupTitle} onChange={e => setPopupTitle(e.target.value)} placeholder={activeTab === "근무장소 설정" ? "근무장소 설정" : "회의"} autoFocus
                   className="w-full h-[45px] text-[26px] leading-none font-medium bg-transparent outline-none pb-1 text-[#202124] placeholder-[#9aa0a6]"
                   style={{ borderBottom: "2px solid #4396FB" }} />
               </div>
@@ -2209,6 +2222,15 @@ export default function App() {
                             );
                           })}
                         </div>
+                        {isAllDay && workingLocation === "vacation" && (
+                          <button type="button" onClick={() => {
+                            const key = localDateKey(popupDate);
+                            setAllDayVacationDates(prev => prev.includes(key) ? prev : [...prev, key]);
+                            setCancelledMeetingDates(prev => prev.includes(key) ? prev : [...prev, key]);
+                          }} className="mt-3 h-8 px-3 rounded-[10px] border border-[#EA4335] text-[12px] font-semibold text-[#C5221F] hover:bg-[#FDE8E7] transition-colors">
+                            회의 모두 취소
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
