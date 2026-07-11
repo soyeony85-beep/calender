@@ -1043,6 +1043,7 @@ export default function App() {
     } else if (workingLocation === "vacation") {
       const key = localDateKey(popupDate);
       setAllDayVacationDates(prev => prev.includes(key) ? prev : [...prev, key]);
+      setCancelledMeetingDates(prev => prev.includes(key) ? prev : [...prev, key]);
     }
     setMyPrefs(prev => ({
       ...prev,
@@ -1623,6 +1624,7 @@ export default function App() {
                   // dayOfWeek: 0=Sun,1=Mon,...,6=Sat → map to 1-based Mon-Fri
                   const dw = day.getDay(); // 1=Mon…5=Fri
                   const myWorkLocation = isPersonVisible(ORGANIZER.id) ? savedWorkLocations[dw] : undefined;
+                  const myVacationToday = isPersonVisible(ORGANIZER.id) && allDayVacationDates.includes(localDateKey(day));
                   const oooPeople = [
                     ...(dw === 4 ? OOO_THURSDAY.map(p => personById(p.id)).filter(p => isPersonVisible(p.id)) : []),
                   ];
@@ -1635,6 +1637,12 @@ export default function App() {
                             {myWorkLocation === "외근" ? <OffsiteCarGlyph /> : <span>{myWorkLocation === "오피스" ? "🏢" : myWorkLocation === "집" ? "🏠" : "🏝️"}</span>}
                           </span>
                           <span>{myWorkLocation}</span>
+                        </div>
+                      )}
+                      {myVacationToday && (
+                        <div className="mt-1 min-h-6 flex items-center gap-1.5 text-[10px] leading-[15px] font-semibold text-[#4E5968]">
+                          <span className="w-6 h-6 rounded-[7px] flex items-center justify-center text-[11px]" style={{ backgroundColor: `${ORGANIZER.avatarColor}24` }}>🏝️</span>
+                          <span>휴가</span>
                         </div>
                       )}
                     </div>
@@ -1663,6 +1671,8 @@ export default function App() {
                           {(() => {
                             if (evs.length === 0) return null;
                             const showEvs = evs;
+                            const regularEvents = showEvs.filter(item => !item.workLocationType);
+                            const hasWorkLocationOverlap = regularEvents.length > 0 && showEvs.some(item => item.workLocationType);
                             const GAP = 2; // px gap between cards
                             return (
                               <>
@@ -1670,9 +1680,14 @@ export default function App() {
                                   const { bg, text } = evPalette(ev.color);
                                   const pendingInvite = (ev as { pendingInvite?: boolean }).pendingInvite;
                                   const canDrag = isOwnEvent(ev);
-                                  const totalMargin = 6 + (ev.columns - 1) * GAP;
-                                  const widthCalc = `calc((100% - ${totalMargin}px) / ${ev.columns})`;
-                                  const leftCalc = ev.column === 0
+                                  const isLocationRail = Boolean(ev.workLocationType);
+                                  const regularIndex = regularEvents.findIndex(item => item.id === ev.id);
+                                  const overlapColumns = hasWorkLocationOverlap ? Math.max(1, regularEvents.length) : ev.columns;
+                                  const totalMargin = (hasWorkLocationOverlap ? 29 : 6) + (overlapColumns - 1) * GAP;
+                                  const widthCalc = isLocationRail ? "20px" : `calc((100% - ${totalMargin}px) / ${overlapColumns})`;
+                                  const leftCalc = isLocationRail ? "3px" : hasWorkLocationOverlap
+                                    ? regularIndex === 0 ? "26px" : `calc(26px + ${regularIndex} * ((100% - ${totalMargin}px) / ${overlapColumns} + ${GAP}px))`
+                                    : ev.column === 0
                                     ? "3px"
                                     : `calc(3px + ${ev.column} * ((100% - ${totalMargin}px) / ${ev.columns} + ${GAP}px))`;
                                   return (
@@ -1692,29 +1707,30 @@ export default function App() {
                                         e.dataTransfer.effectAllowed = "move";
                                       }}
                                       onDragEnd={() => setDraggingEvent(null)}
-                                      className={`absolute top-0.5 rounded-[10px] z-20 overflow-hidden transition-opacity ${canDrag ? "cursor-grab active:cursor-grabbing" : "cursor-not-allowed"} ${draggingEvent?.id === ev.id ? "opacity-45" : ""} ${!pendingInvite && ev.columns > 1 ? "border border-white" : ""}`}
+                                      className={`absolute top-0.5 z-20 overflow-hidden transition-opacity ${isLocationRail ? "rounded-[4px]" : "rounded-[10px]"} ${canDrag ? "cursor-grab active:cursor-grabbing" : "cursor-not-allowed"} ${draggingEvent?.id === ev.id ? "opacity-45" : ""} ${!isLocationRail && !pendingInvite && overlapColumns > 1 ? "border border-white" : ""}`}
                                       style={{
                                         left: leftCalc,
                                         width: widthCalc,
                                         height: `${ev.duration * 64 - 4}px`,
-                                        backgroundColor: ev.workLocationType ? "#fff" : pendingInvite ? "#fff" : bg,
+                                        backgroundColor: isLocationRail ? "transparent" : ev.workLocationType ? "#fff" : pendingInvite ? "#fff" : bg,
                                         border: pendingInvite ? `1.5px dashed ${ev.color}55` : undefined,
-                                        borderLeft: ev.workLocationType ? "3px solid #D9F1FF" : undefined,
-                                        borderRadius: "10px",
-                                        padding: ev.columns >= 5 ? "6px 5px" : pendingInvite ? "7.5px 8.5px" : "6px 7px",
+                                        borderLeft: !isLocationRail && ev.workLocationType ? "3px solid #D9F1FF" : undefined,
+                                        padding: isLocationRail ? "1px 0" : overlapColumns >= 5 ? "6px 5px" : pendingInvite ? "7.5px 8.5px" : "6px 7px",
                                       }}>
+                                      {isLocationRail && <span className="absolute left-0 top-[17px] bottom-0 w-[5px] rounded-[2px]" style={{ backgroundColor: `${ORGANIZER.avatarColor}2E` }} />}
                                       <div className="flex items-center gap-1 min-w-0">
                                         {meetingsCancelled && <X size={11} className="text-[#EA4335] shrink-0" strokeWidth={2.8} />}
                                         {(ev as { urgent?: boolean }).urgent && <img src={EMERGENCY_ICON} alt="" className="w-3 h-3 shrink-0" draggable={false} />}
                                         {ev.workLocationType && (
-                                          <span className="w-5 h-5 -ml-1 rounded-full bg-[#E5F6FF] text-[#18A8E8] flex items-center justify-center shrink-0">
+                                          <span className={`${isLocationRail ? "w-5 h-5" : "w-5 h-5 -ml-1"} rounded-[4px] text-[#1888E9] flex items-center justify-center shrink-0`} style={{ backgroundColor: `${ORGANIZER.avatarColor}24` }}>
                                             {ev.workLocationType === "office" ? <WorkingLocationGlyph type="office" className="w-3 h-3" /> : ev.workLocationType === "home" ? <WorkingLocationGlyph type="home" className="w-3 h-3" /> : ev.workLocationType === "other" ? <OffsiteCarGlyph /> : <span className="text-[10px]">🏝️</span>}
                                           </span>
                                         )}
-                                        <p className={`text-[10px] font-semibold leading-[12.5px] truncate ${meetingsCancelled ? "line-through opacity-55" : ""}`}
+                                        {!isLocationRail && <p className={`text-[10px] font-semibold leading-[12.5px] truncate ${meetingsCancelled ? "line-through opacity-55" : ""}`}
                                           style={{ color: text }}>{ev.title}</p>
+                                        }
                                       </div>
-                                      {ev.duration >= 1 && (
+                                      {!isLocationRail && ev.duration >= 1 && (
                                         <p className="text-[9px] leading-[13.5px] mt-0.5 truncate"
                                           style={{ color: text, opacity: 0.8 }}>
                                           {fmtTime(ev.startHour, 0)} – {fmtTime(
@@ -2222,15 +2238,6 @@ export default function App() {
                             );
                           })}
                         </div>
-                        {isAllDay && workingLocation === "vacation" && (
-                          <button type="button" onClick={() => {
-                            const key = localDateKey(popupDate);
-                            setAllDayVacationDates(prev => prev.includes(key) ? prev : [...prev, key]);
-                            setCancelledMeetingDates(prev => prev.includes(key) ? prev : [...prev, key]);
-                          }} className="mt-3 h-8 px-3 rounded-[10px] border border-[#EA4335] text-[12px] font-semibold text-[#C5221F] hover:bg-[#FDE8E7] transition-colors">
-                            회의 모두 취소
-                          </button>
-                        )}
                       </div>
                     </div>
                   </div>
