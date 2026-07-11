@@ -744,7 +744,7 @@ export default function App() {
   const [schedulePreviewExpanded, setSchedulePreviewExpanded] = useState(true);
   const [locationVal, setLocationVal] = useState("");
   const [descriptionVal, setDescriptionVal] = useState("");
-  const [workingLocation, setWorkingLocation] = useState<"home" | "office" | "other" | "vacation">("office");
+  const [workingLocation, setWorkingLocation] = useState<"home" | "office" | "other" | "vacation" | null>(null);
 
   /* ── Project / Meeting type (extendable) ── */
   const [projects, setProjects] = useState<Project[]>(DEFAULT_PROJECTS);
@@ -981,7 +981,7 @@ export default function App() {
   function openPopup(date: Date, hour: number) {
     setPopupDate(date); setStartH(hour); setStartM(0); setEndH(hour + 1); setEndM(0);
     setPopupTitle(""); setProjectId(null); setMeetingTypeId(null); setRoomVal(""); setRoomSearch(""); setLocationVal(""); setDescriptionVal("");
-    setWorkingLocation("office");
+    setWorkingLocation(null);
     setRoomListExpanded(true);
     setLocationMode("none");
     setIsAllDay(false); setRepeatVal("반복 안 함"); setActiveTab("일정");
@@ -1030,6 +1030,7 @@ export default function App() {
   }
 
   function handleSaveWorkingLocation() {
+    if (!workingLocation) return;
     const label = workingLocation === "home" ? "집" : workingLocation === "office" ? "오피스" : workingLocation === "vacation" ? "휴가" : "외근";
     if (!isAllDay) {
       const meetingId = `work-location-${Date.now()}`;
@@ -1734,7 +1735,11 @@ export default function App() {
                                   return (
                                     <div key={ev.id}
                                       draggable
-                                      onClick={e => { e.stopPropagation(); openEventDetail(ev); }}
+                                      onClick={e => {
+                                        e.stopPropagation();
+                                        if (ev.workLocationType) return;
+                                        openEventDetail(ev);
+                                      }}
                                       onDragStart={e => {
                                         if (!canDrag) {
                                           e.preventDefault();
@@ -1753,17 +1758,21 @@ export default function App() {
                                         left: leftCalc,
                                         width: widthCalc,
                                         height: `${ev.duration * 64 - 4}px`,
-                                        backgroundColor: isLocationRail ? locationPastel : ev.workLocationType ? locationPastel : pendingInvite ? "#fff" : bg,
+                                        backgroundColor: isLocationRail ? "transparent" : ev.workLocationType ? locationPastel : pendingInvite ? "#fff" : bg,
                                         border: pendingInvite ? `1.5px dashed ${ev.color}55` : undefined,
                                         borderLeft: !isLocationRail && ev.workLocationType ? "3px solid #D9F1FF" : undefined,
-                                        padding: isLocationRail ? "4px" : overlapColumns >= 5 ? "6px 5px" : pendingInvite ? "7.5px 8.5px" : "6px 7px",
+                                        padding: isLocationRail ? "0" : overlapColumns >= 5 ? "6px 5px" : pendingInvite ? "7.5px 8.5px" : "6px 7px",
                                       }}>
-                                      {isLocationRail && <span className="absolute left-px top-5 bottom-0 w-1 rounded-[2px]" style={{ backgroundColor: locationAccent }} />}
-                                      <div className="flex items-center gap-1 min-w-0">
+                                      {isLocationRail && (
+                                        <svg className="absolute inset-0 w-5 h-full" viewBox="0 0 20 60" fill="none" preserveAspectRatio="none" aria-hidden="true">
+                                          <path d="M16 0C18.2091 0 20 1.79086 20 4V16C20 18.2091 18.2091 20 16 20H7C5.89543 20 5 20.8954 5 22V58C5 59.1046 4.10457 60 3 60H2C0.895431 60 0 59.1046 0 58V4C0 1.79086 1.79086 0 4 0H16Z" fill={locationPastel} />
+                                        </svg>
+                                      )}
+                                      <div className="relative z-10 flex items-center gap-1 min-w-0">
                                         {meetingsCancelled && <X size={11} className="text-[#EA4335] shrink-0" strokeWidth={2.8} />}
                                         {(ev as { urgent?: boolean }).urgent && <img src={EMERGENCY_ICON} alt="" className="w-3 h-3 shrink-0" draggable={false} />}
                                         {ev.workLocationType && (
-                                          <span className={`${isLocationRail ? "w-3 h-3" : "w-5 h-5 -ml-1"} rounded-[4px] text-[#1888E9] flex items-center justify-center shrink-0`} style={{ backgroundColor: locationPastel }}>
+                                          <span className={`${isLocationRail ? "w-5 h-5" : "w-5 h-5 -ml-1"} rounded-[4px] text-[#1888E9] flex items-center justify-center shrink-0`} style={{ backgroundColor: isLocationRail ? "transparent" : locationPastel }}>
                                             {ev.workLocationType === "office" ? <WorkingLocationGlyph type="office" className="w-3 h-3" /> : ev.workLocationType === "home" ? <WorkingLocationGlyph type="home" className="w-3 h-3" /> : ev.workLocationType === "other" ? <OffsiteCarGlyph /> : <span className="text-[10px]">🏝️</span>}
                                           </span>
                                         )}
@@ -2863,7 +2872,12 @@ export default function App() {
 
               {/* Footer */}
               <div className="h-[76px] flex items-center justify-end px-5 pt-4 pb-5">
-                <button onClick={activeTab === "근무장소 설정" ? handleSaveWorkingLocation : handleSave} className="px-6 py-2.5 rounded-full bg-[#4396FB] text-white text-[14px] leading-5 font-semibold hover:bg-[#2F7FE6] transition-colors shadow-[0px_1px_1.5px_rgba(0,0,0,0.1),0px_1px_1px_rgba(0,0,0,0.1)]">저장</button>
+                <button
+                  onClick={activeTab === "근무장소 설정" ? handleSaveWorkingLocation : handleSave}
+                  disabled={activeTab === "근무장소 설정" && !workingLocation}
+                  className={`px-6 py-2.5 rounded-full text-white text-[14px] leading-5 font-semibold transition-colors shadow-[0px_1px_1.5px_rgba(0,0,0,0.1),0px_1px_1px_rgba(0,0,0,0.1)] ${activeTab === "근무장소 설정" && !workingLocation ? "bg-[#B9D9FF] cursor-not-allowed" : "bg-[#4396FB] hover:bg-[#2F7FE6]"}`}>
+                  저장
+                </button>
               </div>
             </motion.div>
           </motion.div>
