@@ -687,6 +687,7 @@ export default function App() {
   const [detailEvent, setDetailEvent] = useState<CalendarEventDetail | null>(null);
   const [moveBlockedNotice, setMoveBlockedNotice] = useState(false);
   const [allDayVacationDates, setAllDayVacationDates] = useState<string[]>([]);
+  const [allDayWorkLocations, setAllDayWorkLocations] = useState<Record<string, "오피스" | "외근" | "집">>({});
   const [cancelledMeetingDates, setCancelledMeetingDates] = useState<string[]>([]);
   const [miniCalMonth, setMiniCalMonth] = useState(new Date(2026, 6, 1));
   const [addCalOpen, setAddCalOpen] = useState(false);
@@ -1029,7 +1030,7 @@ export default function App() {
   }
 
   function handleSaveWorkingLocation() {
-    const label = workingLocation === "home" ? "집" : workingLocation === "office" ? "Office" : workingLocation === "vacation" ? "휴가" : "외근";
+    const label = workingLocation === "home" ? "집" : workingLocation === "office" ? "오피스" : workingLocation === "vacation" ? "휴가" : "외근";
     if (!isAllDay) {
       const meetingId = `work-location-${Date.now()}`;
       const duration = Math.max(0.5, endH + endM / 60 - startH - startM / 60);
@@ -1049,6 +1050,18 @@ export default function App() {
       const key = localDateKey(popupDate);
       setAllDayVacationDates(prev => prev.includes(key) ? prev : [...prev, key]);
       setCancelledMeetingDates(prev => prev.includes(key) ? prev : [...prev, key]);
+      setAllDayWorkLocations(prev => {
+        const next = { ...prev };
+        delete next[key];
+        return next;
+      });
+    } else {
+      const key = localDateKey(popupDate);
+      setAllDayWorkLocations(prev => ({
+        ...prev,
+        [key]: label as "오피스" | "외근" | "집",
+      }));
+      setAllDayVacationDates(prev => prev.filter(date => date !== key));
     }
     setMyPrefs(prev => ({
       ...prev,
@@ -1642,7 +1655,8 @@ export default function App() {
                 {weekDays.map((day, idx) => {
                   // dayOfWeek: 0=Sun,1=Mon,...,6=Sat → map to 1-based Mon-Fri
                   const dw = day.getDay(); // 1=Mon…5=Fri
-                  const myWorkLocation = isPersonVisible(ORGANIZER.id) ? savedWorkLocations[dw] : undefined;
+                  const dateKey = localDateKey(day);
+                  const myWorkLocation = isPersonVisible(ORGANIZER.id) ? allDayWorkLocations[dateKey] ?? savedWorkLocations[dw] : undefined;
                   const myVacationToday = isPersonVisible(ORGANIZER.id) && allDayVacationDates.includes(localDateKey(day));
                   const oooPeople = [
                     ...(dw === 4 ? OOO_THURSDAY.map(p => personById(p.id)).filter(p => isPersonVisible(p.id)) : []),
