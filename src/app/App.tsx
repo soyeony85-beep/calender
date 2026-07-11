@@ -162,6 +162,21 @@ function SuitcaseGlyph() {
   );
 }
 
+function OffsiteCarGlyph() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" className="shrink-0" aria-hidden="true">
+      <path d="M9.20394 5.40271H1.74204L1.00104 5.71261C0.598137 5.88121 0.335938 6.27511 0.335938 6.71191V8.91541C0.335938 9.21451 0.578338 9.45691 0.877438 9.45691H11.0948C11.4095 9.45691 11.6648 9.20161 11.6648 8.88691V6.89071C11.6648 6.36331 11.303 5.90461 10.7897 5.78191L9.20424 5.40301L9.20394 5.40271Z" fill="#CBCFD2"/>
+      <path d="M9.47977 10.5234C10.1881 10.5234 10.7623 9.94918 10.7623 9.24087C10.7623 8.53257 10.1881 7.95837 9.47977 7.95837C8.77146 7.95837 8.19727 8.53257 8.19727 9.24087C8.19727 9.94918 8.77146 10.5234 9.47977 10.5234Z" fill="#313D4C"/>
+      <path d="M9.4798 9.75391C9.76312 9.75391 9.9928 9.52423 9.9928 9.24091C9.9928 8.95758 9.76312 8.72791 9.4798 8.72791C9.19648 8.72791 8.9668 8.95758 8.9668 9.24091C8.9668 9.52423 9.19648 9.75391 9.4798 9.75391Z" fill="#6B7683"/>
+      <path d="M2.52029 10.5234C3.2286 10.5234 3.80279 9.94918 3.80279 9.24087C3.80279 8.53257 3.2286 7.95837 2.52029 7.95837C1.81199 7.95837 1.23779 8.53257 1.23779 9.24087C1.23779 9.94918 1.81199 10.5234 2.52029 10.5234Z" fill="#313D4C"/>
+      <path d="M2.52032 9.75391C2.80365 9.75391 3.03332 9.52423 3.03332 9.24091C3.03332 8.95758 2.80365 8.72791 2.52032 8.72791C2.237 8.72791 2.00732 8.95758 2.00732 9.24091C2.00732 9.52423 2.237 9.75391 2.52032 9.75391Z" fill="#6B7683"/>
+      <path d="M9.2036 5.40273L8.207 2.92113C8.0336 2.48913 7.6148 2.20593 7.1492 2.20593H3.8069C3.3428 2.20593 2.9252 2.48733 2.7506 2.91723L1.7417 5.40273H9.2036Z" fill="#313D4C"/>
+      <path d="M11.6643 7.66141H11.4267C11.2299 7.66141 11.0703 7.50181 11.0703 7.30501C11.0703 7.10821 11.2299 6.94861 11.4267 6.94861H11.6643V7.66141Z" fill="white"/>
+      <path d="M0.335938 7.66135H0.858538C1.05534 7.66135 1.21494 7.50175 1.21494 7.30525C1.21494 7.10875 1.05534 6.94885 0.858838 6.94885H0.336238V7.66135H0.335938Z" fill="#EF4452"/>
+    </svg>
+  );
+}
+
 function PreferenceGlyph({ className = "shrink-0" }: { className?: string }) {
   return (
     <svg width="14" height="14" viewBox="1 32 24 24" fill="none" className={className} aria-hidden="true">
@@ -222,7 +237,7 @@ function OutOfOfficeChip({ people }: { people: { name: string; avatarColor: stri
             key={person.name}
             className="w-6 h-6 rounded-[7px] flex items-center justify-center shrink-0"
             style={{ backgroundColor: `${person.avatarColor}24` }}>
-            <SuitcaseGlyph />
+            <OffsiteCarGlyph />
           </span>
         ))}
       </span>
@@ -673,11 +688,21 @@ export default function App() {
   const [showMyMenu, setShowMyMenu] = useState(false);
   const [showMyPrefs, setShowMyPrefs] = useState(false);
   const [myPrefsTab, setMyPrefsTab] = useState<"meeting" | "ooo">("ooo");
+  const [applyWorkHours, setApplyWorkHours] = useState(false);
+  const [workDays, setWorkDays] = useState([1, 2, 3, 4, 5]);
+  const [workLocations, setWorkLocations] = useState(["오피스", "오피스", "오피스", "오피스", "외근", "집", "오피스"]);
+  const [savedWorkLocations, setSavedWorkLocations] = useState<Record<number, string>>({});
+  const [workLocationMenuDay, setWorkLocationMenuDay] = useState<number | null>(null);
   const [myPrefs, setMyPrefs] = useState({
     avoidLunch: false,    // 점심 직후 (13:00–14:00)
     avoidMorning: false,  // 오전 9시 이전
     avoidEvening: false,  // 오후 6시 이후
     oooDays: [] as number[], // 1=Mon … 5=Fri
+  });
+  const [appliedMeetingPrefs, setAppliedMeetingPrefs] = useState({
+    avoidLunch: false,
+    avoidMorning: false,
+    avoidEvening: false,
   });
 
   /* ── Popup state ── */
@@ -704,7 +729,7 @@ export default function App() {
   const [schedulePreviewExpanded, setSchedulePreviewExpanded] = useState(true);
   const [locationVal, setLocationVal] = useState("");
   const [descriptionVal, setDescriptionVal] = useState("");
-  const [workingLocation, setWorkingLocation] = useState<"home" | "office" | "other">("office");
+  const [workingLocation, setWorkingLocation] = useState<"home" | "office" | "other" | "vacation">("office");
 
   /* ── Project / Meeting type (extendable) ── */
   const [projects, setProjects] = useState<Project[]>(DEFAULT_PROJECTS);
@@ -990,7 +1015,7 @@ export default function App() {
   }
 
   function handleSaveWorkingLocation() {
-    const label = workingLocation === "home" ? "재택근무" : workingLocation === "office" ? "오피스 근무" : "외근";
+    const label = workingLocation === "home" ? "재택근무" : workingLocation === "office" ? "오피스 근무" : workingLocation === "vacation" ? "휴가" : "외근";
     setMyPrefs(prev => ({
       ...prev,
       oooDays: workingLocation === "other"
@@ -1117,7 +1142,9 @@ export default function App() {
     }
     return sampleAttendeeIds(ev).map((id) => ({
       person: personById(id),
-      status: "accepted",
+      // 샘플 캘린더에 실제 일정 카드가 있는 소유자만 수락 상태로 표시한다.
+      // 초대되었지만 해당 팀원의 캘린더에 일정이 없는 참석자는 거절(X) 상태다.
+      status: id === ev.personId ? "accepted" : "declined",
     }));
   }
 
@@ -1180,20 +1207,20 @@ export default function App() {
       {
         startHour: 1,
         duration: 8,
-        people: uniquePeople(myPrefs.avoidMorning && isPersonVisible(ORGANIZER.id) ? [ORGANIZER] : []),
+        people: uniquePeople(appliedMeetingPrefs.avoidMorning && isPersonVisible(ORGANIZER.id) ? [ORGANIZER] : []),
       },
       {
         startHour: 13,
         duration: 1,
         people: uniquePeople([
           ...LUNCH_AVOID_PEOPLE.filter(p => isPersonVisible(p.id)),
-          ...(myPrefs.avoidLunch && isPersonVisible(ORGANIZER.id) ? [ORGANIZER] : []),
+          ...(appliedMeetingPrefs.avoidLunch && isPersonVisible(ORGANIZER.id) ? [ORGANIZER] : []),
         ]),
       },
       {
         startHour: 18,
         duration: 6,
-        people: uniquePeople(myPrefs.avoidEvening && isPersonVisible(ORGANIZER.id) ? [ORGANIZER] : []),
+        people: uniquePeople(appliedMeetingPrefs.avoidEvening && isPersonVisible(ORGANIZER.id) ? [ORGANIZER] : []),
       },
     ].filter(block => block.people.length > 0);
   }
@@ -1554,14 +1581,21 @@ export default function App() {
                 {weekDays.map((day, idx) => {
                   // dayOfWeek: 0=Sun,1=Mon,...,6=Sat → map to 1-based Mon-Fri
                   const dw = day.getDay(); // 1=Mon…5=Fri
-                  const myOOOToday = myPrefs.oooDays.includes(dw) && isPersonVisible(ORGANIZER.id);
+                  const myWorkLocation = isPersonVisible(ORGANIZER.id) ? savedWorkLocations[dw] : undefined;
                   const oooPeople = [
                     ...(dw === 4 ? OOO_THURSDAY.map(p => personById(p.id)).filter(p => isPersonVisible(p.id)) : []),
-                    ...(myOOOToday ? [ORGANIZER] : []),
                   ];
                   return (
                     <div key={idx} className="flex-1 min-h-[55px] border-l border-[#e8eaed] pl-[5px] pr-1 py-1.5 overflow-visible">
                       <OutOfOfficeChip people={oooPeople} />
+                      {myWorkLocation && (
+                        <div className="mt-1 min-h-6 flex items-center gap-1.5 text-[10px] leading-[15px] font-semibold text-[#4E5968]">
+                          <span className="w-6 h-6 rounded-[7px] bg-[#4396FB24] flex items-center justify-center">
+                            {myWorkLocation === "외근" ? <OffsiteCarGlyph /> : <span>{myWorkLocation === "오피스" ? "🏢" : myWorkLocation === "집" ? "🏠" : "🏝️"}</span>}
+                          </span>
+                          <span>{myWorkLocation}</span>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
@@ -1918,7 +1952,7 @@ export default function App() {
             onClick={e => { if (e.target === e.currentTarget) setShowMyPrefs(false); }}>
             <motion.div initial={{ opacity: 0, scale: 0.96, y: 8 }} animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96, y: 8 }} transition={{ duration: 0.16 }}
-              className="bg-white rounded-2xl shadow-2xl w-[400px] overflow-hidden">
+              className="bg-white rounded-2xl shadow-[0px_25px_50px_-12px_rgba(0,0,0,0.25)] w-[400px] max-w-[calc(100vw-32px)] max-h-[calc(100vh-32px)] overflow-hidden flex flex-col">
 
               {/* Header */}
               <div className="flex items-center justify-between px-5 py-4 border-b border-[#e8eaed]">
@@ -1949,7 +1983,7 @@ export default function App() {
               </div>
 
               {/* Content */}
-              <div className="px-5 py-4 space-y-4 min-h-[200px]">
+              <div className="px-5 py-4 min-h-0 flex-1 overflow-y-auto" style={{ scrollbarWidth: "thin" }}>
                 {myPrefsTab === "meeting" && (
                   <>
                     <p className="text-xs text-[#9aa0a6] leading-relaxed">
@@ -1973,12 +2007,6 @@ export default function App() {
                             <p className="text-sm font-medium text-[#202124]">{label}</p>
                             <p className="text-xs text-[#9aa0a6] mt-0.5">{desc}</p>
                           </div>
-                          {active && (
-                            <span className="text-[9px] font-bold px-2 py-0.5 rounded-full"
-                              style={{ backgroundColor: ORGANIZER.avatarColor + "18", color: ORGANIZER.avatarColor }}>
-                              캘린더 표시 중
-                            </span>
-                          )}
                         </label>
                       );
                     })}
@@ -1986,47 +2014,70 @@ export default function App() {
                 )}
 
                 {myPrefsTab === "ooo" && (
-                  <>
-                    <p className="text-xs text-[#9aa0a6] leading-relaxed">
-                      반복 외근 요일을 설정하면 캘린더 종일 행에 표시되며, 팀원의 회의 생성 시 참고됩니다.
-                    </p>
-                    <div>
-                      <p className="text-xs font-semibold text-[#5f6368] mb-3">반복 외근 요일</p>
-                      <div className="flex gap-2">
-                        {["월","화","수","목","금"].map((d, i) => {
-                          const dayNum = i + 1;
-                          const active = myPrefs.oooDays.includes(dayNum);
-                          return (
-                            <button key={d}
-                              onClick={() => setMyPrefs(p => ({
-                                ...p,
-                                oooDays: active ? p.oooDays.filter(x => x !== dayNum) : [...p.oooDays, dayNum],
-                              }))}
-                              className={`w-11 h-11 rounded-full text-sm font-semibold transition-all
-                                ${active ? "text-white shadow-sm" : "bg-[#f1f3f4] text-[#5f6368] hover:bg-[#e8eaed]"}`}
-                              style={active ? { backgroundColor: ORGANIZER.avatarColor } : {}}>
-                              {d}
-                            </button>
-                          );
-                        })}
-                      </div>
+                  <div>
+                    <div className="flex gap-2 mb-3">
+                      {["일","월","화","수","목","금","토"].map((d, i) => {
+                        const dayNum = i;
+                        const active = workDays.includes(dayNum);
+                        return <button key={d} onClick={() => {
+                          setWorkDays(days => active ? days.filter(x => x !== dayNum) : [...days, dayNum].sort());
+                        }} className={`w-10 h-10 rounded-full text-sm font-semibold transition-colors ${active ? "bg-[#4396FB] text-white" : "bg-[#f1f3f4] text-[#5f6368]"}`}>{d}</button>;
+                      })}
                     </div>
-                    {myPrefs.oooDays.length > 0 && (
-                      <div className="flex items-start gap-2 p-3 rounded-xl bg-[#ECF5FF]">
-                        <SuitcaseGlyph />
-                        <p className="text-xs text-[#4396FB] leading-relaxed">
-                          {["월","화","수","목","금"].filter((_, i) => myPrefs.oooDays.includes(i + 1)).join(", ")}요일에 외근이 캘린더에 표시됩니다.
-                        </p>
-                      </div>
-                    )}
-                  </>
+
+                    <label className="inline-flex items-center gap-2 text-xs text-[#5f6368] cursor-pointer mb-7">
+                      <button type="button" role="checkbox" aria-checked={applyWorkHours} onClick={() => setApplyWorkHours(v => !v)}
+                        className={`w-4 h-4 rounded-[4px] border-2 flex items-center justify-center ${applyWorkHours ? "bg-[#4396FB] border-[#4396FB]" : "border-[#9aa0a6]"}`}>
+                        {applyWorkHours && <Check size={11} className="text-white" strokeWidth={3} />}
+                      </button>
+                      근무 시간 적용
+                    </label>
+
+                    <p className="text-xs font-medium text-[#3c4043] mb-3">근무장소 선택</p>
+                    <div className="space-y-2">
+                      {["일요일","월요일","화요일","수요일","목요일","금요일","토요일"].map((day, dayNum) => workDays.includes(dayNum) && (
+                        <div key={day} className="flex items-center gap-3 h-8 relative">
+                          <span className="w-[41px] text-sm font-medium text-black text-center shrink-0">{day}</span>
+                          {applyWorkHours && <>
+                            <button className="h-8 px-3 rounded-[10px] bg-[#f1f3f4] text-sm font-medium text-[#5f6368]">오전 9:00</button>
+                            <span className="text-sm text-[#5f6368]">–</span>
+                            <button className="h-8 px-3 rounded-[10px] bg-[#f1f3f4] text-sm font-medium text-[#5f6368]">오후 6:00</button>
+                          </>}
+                          <button onClick={() => setWorkLocationMenuDay(v => v === dayNum ? null : dayNum)}
+                            className="h-8 min-w-[103px] px-3 rounded-[10px] bg-[#f1f3f4] flex items-center gap-2 text-sm font-medium text-[#5f6368]">
+                            <span className="w-3 h-3 flex items-center justify-center text-[11px]">{workLocations[dayNum] === "오피스" ? "🏢" : workLocations[dayNum] === "외근" ? <OffsiteCarGlyph /> : workLocations[dayNum] === "집" ? "🏠" : "🏝️"}</span>
+                            <span>{workLocations[dayNum]}</span><ChevronDown size={14} className="ml-auto" />
+                          </button>
+                          {workLocationMenuDay === dayNum && (
+                            <div className={`absolute left-[53px] z-20 w-[130px] max-h-[168px] overflow-y-auto rounded-[10px] border border-[#e8eaed] bg-white py-1 shadow-xl ${dayNum >= 4 ? "bottom-9" : "top-9"}`}>
+                              {["오피스", "외근", "집", "휴가"].map(location => (
+                                <button key={location} onClick={() => { setWorkLocations(v => v.map((x, n) => n === dayNum ? location : x)); setWorkLocationMenuDay(null); }} className="w-full px-3 py-2 flex items-center gap-2 text-sm text-[#5f6368] hover:bg-[#f1f3f4]">
+                                  <span className="w-3 flex justify-center">{location === "오피스" ? "🏢" : location === "외근" ? <OffsiteCarGlyph /> : location === "집" ? "🏠" : "🏝️"}</span>{location}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </div>
 
               {/* Footer */}
-              <div className="flex items-center justify-end gap-3 px-5 py-4 border-t border-[#e8eaed]">
+              <div className="flex items-center justify-end gap-3 px-5 py-4 border-t border-[#e8eaed] bg-white shrink-0">
                 <button onClick={() => setShowMyPrefs(false)} className="text-sm text-[#5f6368] hover:underline">취소</button>
-                <button onClick={() => setShowMyPrefs(false)}
+                <button onClick={() => {
+                  const next = Object.fromEntries(workDays.map(day => [day, workLocations[day]]));
+                  setSavedWorkLocations(next);
+                  setAppliedMeetingPrefs({
+                    avoidLunch: myPrefs.avoidLunch,
+                    avoidMorning: myPrefs.avoidMorning,
+                    avoidEvening: myPrefs.avoidEvening,
+                  });
+                  setMyPrefs(p => ({ ...p, oooDays: workDays.filter(day => workLocations[day] === "외근") }));
+                  setShowMyPrefs(false);
+                }}
                   className="px-5 py-2 rounded-full bg-[#4396FB] text-white text-sm font-semibold hover:bg-[#2F7FE6] transition-colors shadow-sm">
                   저장 및 적용
                 </button>
@@ -2073,54 +2124,44 @@ export default function App() {
                 <>
                   <div className="bg-white rounded-[16px] mx-4 mb-3 px-5 py-6">
                     <div className="flex items-start gap-4">
-                      <ModalGlyph name="clock" className="mt-1" />
+                      <ModalGlyph name="clock" className="mt-0.5" />
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-3">
-                          <p className="text-[18px] leading-7 font-medium text-[#202124]">
-                            {fmtDateShort(popupDate)} – {fmtDateShort(popupDate)}
-                          </p>
-                          <button
-                            type="button"
-                            className="h-11 px-5 rounded-full border border-[#80868b] text-[15px] leading-5 font-semibold text-[#0B57D0] hover:bg-[#f1f3f4] transition-colors">
-                            시간 추가
-                          </button>
+                        <div className="flex items-center gap-2">
+                          <button className="h-9 px-4 rounded-[10px] bg-[#f1f3f4] text-[14px] font-medium text-[#5f6368]">{fmtDateShort(popupDate)}</button>
+                          {!isAllDay && <>
+                            <button className="h-9 px-4 rounded-[10px] bg-[#f1f3f4] text-[14px] font-medium text-[#5f6368]">{fmtTime(startH, startM)}</button>
+                            <span className="text-sm text-[#5f6368]">–</span>
+                            <button className="h-9 px-4 rounded-[10px] bg-[#f1f3f4] text-[14px] font-medium text-[#5f6368]">{fmtTime(endH, endM)}</button>
+                          </>}
                         </div>
-                        <p className="mt-3 text-[14px] leading-5 text-[#5f6368]">
-                          반복 근무장소는 <button type="button" className="text-[#0B57D0] underline underline-offset-2">설정</button>에서 관리할 수 있습니다
-                        </p>
+                        <div className="flex items-center gap-4 py-3">
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <button type="button" role="checkbox" aria-checked={isAllDay} onClick={() => setIsAllDay(v => !v)} className={`w-4 h-4 rounded-[4px] border-2 flex items-center justify-center ${isAllDay ? "bg-[#4396FB] border-[#4396FB]" : "border-[#9aa0a6]"}`}>{isAllDay && <Check size={10} className="text-white" strokeWidth={3} />}</button>
+                            <span className="text-[14px] font-medium text-[#5f6368]">종일</span>
+                          </label>
+                          <button className="text-[14px] font-medium text-[#4396FB]">시간대</button>
+                        </div>
+                        <button className="h-9 px-4 rounded-[10px] bg-[#f1f3f4] flex items-center gap-2 text-[14px] font-medium text-[#5f6368]">반복 안 함 <ChevronDown size={14} /></button>
                       </div>
                     </div>
 
                     <div className="flex items-start gap-4 mt-9">
-                      <ModalGlyph name="pin" className="mt-0.5" />
+                      <SuitcaseGlyph />
                       <div className="flex-1 min-w-0">
-                        <p className="text-[18px] leading-7 font-medium text-[#3c4043]">근무장소 선택</p>
-                        <div className="mt-4 flex flex-wrap gap-3">
+                        <p className="text-[14px] leading-7 font-medium text-[#3c4043]">근무장소 선택</p>
+                        <div className="mt-2 flex flex-wrap gap-2">
                           {([
-                            ["home", "재택"],
-                            ["office", "오피스"],
+                            ["office", "오피스"], ["other", "외근"], ["home", "집"], ["vacation", "휴가"],
                           ] as const).map(([value, label]) => {
                             const selected = workingLocation === value;
                             return (
-                              <button
-                                key={value}
-                                type="button"
-                                onClick={() => setWorkingLocation(value)}
-                                className={`h-12 px-5 rounded-full border flex items-center gap-3 text-[16px] leading-6 font-semibold transition-colors
-                                  ${selected ? "border-[#4396FB] bg-[#ECF5FF] text-[#0B57D0]" : "border-[#80868b] text-[#0B57D0] hover:bg-[#f1f3f4]"}`}>
-                                <WorkingLocationGlyph type={value} />
+                              <button key={value} type="button" onClick={() => setWorkingLocation(value)}
+                                className={`h-8 px-3 rounded-[10px] flex items-center gap-1 text-[12px] leading-4 font-semibold transition-colors ${selected ? "bg-[#ECF5FF] text-[#4396FB]" : "bg-[#f1f3f4] text-[#5f6368]"}`}>
+                                {value === "office" ? <WorkingLocationGlyph type="office" className="w-3 h-3" /> : value === "home" ? <WorkingLocationGlyph type="home" className="w-3 h-3" /> : value === "other" ? <OffsiteCarGlyph /> : <span className="text-[11px]">🏝️</span>}
                                 <span>{label}</span>
                               </button>
                             );
                           })}
-                          <button
-                            type="button"
-                            onClick={() => setWorkingLocation("other")}
-                            className={`h-12 px-5 rounded-full border flex items-center gap-3 text-[16px] leading-6 font-semibold transition-colors
-                              ${workingLocation === "other" ? "border-[#4396FB] bg-[#ECF5FF] text-[#0B57D0]" : "border-[#80868b] text-[#0B57D0] hover:bg-[#f1f3f4]"}`}>
-                            <span>다른 위치</span>
-                            <ChevronDown size={18} />
-                          </button>
                         </div>
                       </div>
                     </div>
@@ -2129,10 +2170,7 @@ export default function App() {
                   <div className="bg-white rounded-[16px] mx-4 mb-4 px-5 py-[14px]">
                     <div className="flex items-center gap-3">
                       <ModalGlyph name="calendar" />
-                      <div className="flex items-center gap-3">
-                        <span className="text-[16px] leading-6 font-medium text-[#3c4043]">윤소연</span>
-                        <span className="w-5 h-5 rounded-full bg-[#4396FB]" aria-hidden="true" />
-                      </div>
+                      <span className="text-[14px] leading-6 font-medium text-[#3c4043]">윤소연</span>
                     </div>
                   </div>
                 </>
