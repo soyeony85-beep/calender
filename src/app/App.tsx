@@ -644,19 +644,33 @@ function ProfileAvatar({ person, size = 36 }: {
   );
 }
 
-function PersonRow({ person, role }: {
+function OptionalAttendeeGlyph() {
+  return <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M5.9993 5.79059C7.22537 5.79059 8.2193 4.79666 8.2193 3.57059C8.2193 2.34451 7.22537 1.35059 5.9993 1.35059C4.77322 1.35059 3.7793 2.34451 3.7793 3.57059C3.7793 4.79666 4.77322 5.79059 5.9993 5.79059Z" fill="#5F6368"/><path d="M5.99967 6.46973C3.01587 6.46973 1.85547 8.50433 1.85547 9.45053C1.85547 10.3967 4.32597 10.6487 5.99967 10.6487C7.67337 10.6487 10.1439 10.3967 10.1439 9.45053C10.1439 8.50433 8.98347 6.46973 5.99967 6.46973Z" fill="#5F6368"/></svg>;
+}
+
+function ScheduleWarningGlyph() {
+  return <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M5.01757 1.98936L.843069 9.21996C.406569 9.97596.952269 10.921 1.82527 10.921H10.1746C11.0476 10.921 11.593 9.97596 11.1568 9.21996L6.98197 1.98936C6.54547 1.23336 5.45407 1.23336 5.01757 1.98936Z" fill="#FFCD00"/><path d="M5.99962 8.26367C5.68642 8.26367 5.43262 8.51747 5.43262 8.83067C5.43262 9.14387 5.68642 9.39767 5.99962 9.39767C6.31282 9.39767 6.56662 9.14387 6.56662 8.83067C6.56662 8.51747 6.31282 8.26367 5.99962 8.26367Z" fill="#303D4C"/><path d="M5.99953 7.52318C5.73433 7.52318 5.51953 7.30838 5.51953 7.04318V4.68068C5.51953 4.41548 5.73433 4.20068 5.99953 4.20068C6.26473 4.20068 6.47953 4.41548 6.47953 4.68068V7.04318C6.47953 7.30838 6.26473 7.52318 5.99953 7.52318Z" fill="#303D4C"/></svg>;
+}
+
+function PersonRow({ person, role, onMakeOptional, onRemove }: {
   person: { id: number; name: string; initials: string; avatarColor: string };
   role: string;
+  onMakeOptional?: () => void;
+  onRemove?: () => void;
 }) {
   return (
     <div
-      className="h-12 flex items-center gap-3 px-1 py-1.5 rounded-[10px] hover:bg-[#f1f3f4] transition-colors"
+      className="group h-12 flex items-center gap-3 px-1 py-1.5 rounded-[10px] hover:bg-[#f1f3f4] transition-colors"
       style={{ fontFamily: "'Pretendard', 'Noto Sans KR', sans-serif" }}>
       <ProfileAvatar person={person} />
       <div className="flex-1 min-w-0 flex items-center gap-2">
         <p className="text-[14px] leading-5 font-medium text-[#202124] truncate">{person.name}</p>
         <span className="text-[10px] leading-[15px] font-semibold px-[6px] py-[2px] rounded-[4px] bg-[#f1f3f4] text-[#5f6368] shrink-0">{role}</span>
       </div>
+      {(onMakeOptional || onRemove) && <div className="ml-auto flex items-center gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+        {onMakeOptional && <button type="button" onClick={onMakeOptional} title="선택 참석자로 표시" aria-label={`${person.name} 선택 참석자로 표시`} className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-[#e1e5e9]"><OptionalAttendeeGlyph /></button>}
+        {onRemove && <button type="button" onClick={onRemove} title="삭제" aria-label={`${person.name} 참석자 삭제`} className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-[#e1e5e9]"><X size={14} className="text-[#5F6368]" /></button>}
+      </div>}
     </div>
   );
 }
@@ -668,24 +682,18 @@ function AttendanceAvatar({ person, status, size = 36 }: {
 }) {
   const statusStyle = {
     accepted: { bg: "#34A853", label: "수락", mark: <Check size={9} strokeWidth={3.2} /> },
-    pending: { bg: "transparent", label: "미정", mark: (
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-        <circle cx="7.80039" cy="7.80002" r="6.9" fill="#9AA0A6" stroke="white" />
-        <path d="M7.78044 9.46119C7.44827 9.46119 7.17915 9.19206 7.17915 8.8599C7.17915 7.88114 7.77512 7.40618 8.20982 7.05934C8.55995 6.78009 8.76173 6.60666 8.83515 6.28716C8.89465 6.02791 8.84984 5.80892 8.69743 5.61777C8.4997 5.36966 8.13133 5.20257 7.78044 5.20257C7.32295 5.20257 6.92395 5.49549 6.78775 5.93145C6.75661 6.0312 6.74066 6.13576 6.74066 6.24235C6.74066 6.57451 6.47153 6.84363 6.13937 6.84363C5.80721 6.84363 5.53809 6.57451 5.53809 6.24235C5.53809 6.01373 5.57252 5.78841 5.63986 5.57245C5.93379 4.63217 6.79408 4 7.78018 4C8.49945 4 9.21137 4.33292 9.63796 4.86864C10.0167 5.34409 10.1479 5.94361 10.0068 6.55628C9.83594 7.30061 9.34985 7.68822 8.95921 7.99987C8.55843 8.31938 8.38147 8.4766 8.38147 8.8599C8.38147 9.19206 8.1126 9.46119 7.78044 9.46119Z" fill="white" />
-        <path d="M7.78895 10.1721C7.28413 10.1721 6.875 10.5812 6.875 11.0861C6.875 11.5909 7.28413 12 7.78895 12C8.29378 12 8.70291 11.5909 8.70291 11.0861C8.70291 10.5812 8.29378 10.1721 7.78895 10.1721Z" fill="white" />
-      </svg>
-    ) },
+    pending: { bg: "transparent", label: "미정", mark: null },
     declined: { bg: "#EA4335", label: "거절", mark: <X size={9} strokeWidth={3.2} /> },
   }[status];
 
   return (
     <div className="relative shrink-0" title={`${person.name} · ${statusStyle.label}`}>
       <ProfileAvatar person={person} size={size} />
-      <span
+      {status !== "pending" && <span
         className={`absolute left-[22px] top-[22px] w-4 h-4 rounded-full flex items-center justify-center text-white ${status === "pending" ? "" : "border border-white"}`}
         style={{ backgroundColor: statusStyle.bg }}>
         {statusStyle.mark}
-      </span>
+      </span>}
     </div>
   );
 }
@@ -770,6 +778,8 @@ export default function App() {
   const [attendeeQuery, setAttendeeQuery] = useState("");
   const [attendeeSearchOpen, setAttendeeSearchOpen] = useState(false);
   const [addedAttendeeIds, setAddedAttendeeIds] = useState<number[]>([]);
+  const [optionalAttendeeIds, setOptionalAttendeeIds] = useState<number[]>([]);
+  const [removedAttendeeIds, setRemovedAttendeeIds] = useState<number[]>([]);
   const [awayAutoCancel, setAwayAutoCancel] = useState(true);
   const [awayCancelScope, setAwayCancelScope] = useState<"existing" | "all">("all");
   const [taskDeadline, setTaskDeadline] = useState("");
@@ -1010,7 +1020,7 @@ export default function App() {
   function openPopup(date: Date, hour: number) {
     setPopupDate(date); setStartH(hour); setStartM(0); setEndH(hour + 1); setEndM(0);
     setPopupTitle(""); setProjectId(null); setMeetingTypeId(null); setRoomVal(""); setRoomSearch(""); setLocationVal(""); setDescriptionVal("");
-    setAttendeeQuery(""); setAttendeeSearchOpen(false); setAddedAttendeeIds([]);
+    setAttendeeQuery(""); setAttendeeSearchOpen(false); setAddedAttendeeIds([]); setOptionalAttendeeIds([]); setRemovedAttendeeIds([]);
     setWorkingLocation(null);
     setAwayAutoCancel(true);
     setAwayCancelScope("all");
@@ -1034,9 +1044,9 @@ export default function App() {
     // Build participant list: organizer + project members (required + optional)
     const participants: { id: number; color: string }[] = [
       { id: ORGANIZER.id, color: ORGANIZER.avatarColor },
-      ...requiredPeople.map(p => ({ id: p.id, color: p.avatarColor })),
-      ...optionalPeople.map(p => ({ id: p.id, color: p.avatarColor })),
-      ...allPeople.filter(p => addedAttendeeIds.includes(p.id)).map(p => ({ id: p.id, color: p.avatarColor })),
+      ...requiredPeople.filter(p => !removedAttendeeIds.includes(p.id)).map(p => ({ id: p.id, color: p.avatarColor })),
+      ...optionalPeople.filter(p => !removedAttendeeIds.includes(p.id)).map(p => ({ id: p.id, color: p.avatarColor })),
+      ...allPeople.filter(p => addedAttendeeIds.includes(p.id) && !removedAttendeeIds.includes(p.id)).map(p => ({ id: p.id, color: p.avatarColor })),
     ];
 
     // Deduplicate by id
@@ -2913,17 +2923,17 @@ export default function App() {
                     {projectId && requiredPeople.length > 0 && (
                       <>
                         {meetingTypeId && <p className="text-[10px] font-semibold text-[#5f6368] uppercase tracking-wide px-1 pt-3 pb-1">필수 참석자</p>}
-                        {requiredPeople.map(p => <PersonRow key={p.id} person={p} role={p.role} />)}
+                        {requiredPeople.filter(p => !optionalAttendeeIds.includes(p.id) && !removedAttendeeIds.includes(p.id)).map(p => <PersonRow key={p.id} person={p} role={p.role} onMakeOptional={() => setOptionalAttendeeIds(ids => [...new Set([...ids, p.id])])} onRemove={() => setRemovedAttendeeIds(ids => [...new Set([...ids, p.id])])} />)}
                       </>
                     )}
                     {projectId && optionalPeople.length > 0 && (
                       <>
                         <p className="text-[10px] font-semibold text-[#5f6368] uppercase tracking-wide px-1 pt-3 pb-1">선택 참석자</p>
-                        {optionalPeople.map(p => <PersonRow key={p.id} person={p} role={p.role} />)}
+                        {[...optionalPeople, ...requiredPeople.filter(p => optionalAttendeeIds.includes(p.id))].filter((p, index, rows) => rows.findIndex(row => row.id === p.id) === index && !removedAttendeeIds.includes(p.id)).map(p => <PersonRow key={p.id} person={p} role={p.role} onRemove={() => setRemovedAttendeeIds(ids => [...new Set([...ids, p.id])])} />)}
                       </>
                     )}
-                    {allPeople.filter(person => addedAttendeeIds.includes(person.id) && !requiredPeople.some(p => p.id === person.id) && !optionalPeople.some(p => p.id === person.id)).map(person => (
-                      <PersonRow key={`added-${person.id}`} person={person} role={person.role} />
+                    {allPeople.filter(person => addedAttendeeIds.includes(person.id) && !removedAttendeeIds.includes(person.id) && !requiredPeople.some(p => p.id === person.id) && !optionalPeople.some(p => p.id === person.id)).map(person => (
+                      <PersonRow key={`added-${person.id}`} person={person} role={person.role} onMakeOptional={() => setOptionalAttendeeIds(ids => [...new Set([...ids, person.id])])} onRemove={() => { setAddedAttendeeIds(ids => ids.filter(id => id !== person.id)); setOptionalAttendeeIds(ids => ids.filter(id => id !== person.id)); }} />
                     ))}
                   </div>
                 </div>
@@ -2960,7 +2970,7 @@ export default function App() {
                                 <p className="mb-2 text-[10px] leading-[15px] text-[#9aa0a6]">현재 주 범위 외</p>
                               )}
                               <SchedulePreview
-                                participants={[ORGANIZER, ...requiredPeople, ...optionalPeople, ...allPeople.filter(person => addedAttendeeIds.includes(person.id) && !requiredPeople.some(p => p.id === person.id) && !optionalPeople.some(p => p.id === person.id))].filter(p => isPersonVisible(p.id))}
+                                participants={[ORGANIZER, ...requiredPeople, ...optionalPeople, ...allPeople.filter(person => addedAttendeeIds.includes(person.id) && !requiredPeople.some(p => p.id === person.id) && !optionalPeople.some(p => p.id === person.id))].filter((p, index, rows) => rows.findIndex(row => row.id === p.id) === index && !removedAttendeeIds.includes(p.id) && isPersonVisible(p.id))}
                                 dayOffset={getDayOffset(popupDate)}
                                 sampleEvents={sampleEventsForWeek}
                                 selStartH={startH} selStartM={startM}
@@ -2970,7 +2980,7 @@ export default function App() {
                               {(() => {
                                 const do_ = getDayOffset(popupDate);
                                 if (do_ < 0) return null;
-                                const allP = [ORGANIZER, ...requiredPeople, ...optionalPeople, ...allPeople.filter(person => addedAttendeeIds.includes(person.id) && !requiredPeople.some(p => p.id === person.id) && !optionalPeople.some(p => p.id === person.id))].filter(p => isPersonVisible(p.id));
+                                const allP = [ORGANIZER, ...requiredPeople, ...optionalPeople, ...allPeople.filter(person => addedAttendeeIds.includes(person.id) && !requiredPeople.some(p => p.id === person.id) && !optionalPeople.some(p => p.id === person.id))].filter((p, index, rows) => rows.findIndex(row => row.id === p.id) === index && !removedAttendeeIds.includes(p.id) && isPersonVisible(p.id));
                                 const conflicts = allP.filter(p => {
                                   const evs = sampleEventsForWeek.filter(e => e.dayOffset === do_ && COLOR_TO_PID[e.color] === p.id && isEventVisible(e));
                                   return evs.some(ev => {
@@ -2980,15 +2990,23 @@ export default function App() {
                                     return ev.startHour < sEnd && evEnd > sStart;
                                   });
                                 });
-                                if (conflicts.length === 0) return (
+                                const sStart = startH + startM / 60;
+                                const sEnd = endH + endM / 60;
+                                const offsitePeople = do_ === 4 ? allP.filter(p => OOO_THURSDAY.some(person => person.id === p.id)) : [];
+                                const lunchAvoidPeople = sStart < 14 && sEnd > 13
+                                  ? allP.filter(p => LUNCH_AVOID_PEOPLE.some(person => person.id === p.id) || (p.id === ORGANIZER.id && appliedMeetingPrefs.avoidLunch))
+                                  : [];
+                                const warningPeople = [...conflicts, ...offsitePeople, ...lunchAvoidPeople].filter((p, index, rows) => rows.findIndex(row => row.id === p.id) === index);
+                                if (warningPeople.length === 0) return (
                                   <p className="pt-3 flex items-center gap-1 text-[10px] leading-[15px] font-medium text-[#00BD79]">
                                     <span className="w-3 h-3 rounded-full bg-[#00BD79] text-white flex items-center justify-center shrink-0"><Check size={8} strokeWidth={3} /></span>
                                     <span className="w-[153px]">모든 참석자가 참여 가능한 시간입니다.</span>
                                   </p>
                                 );
                                 return (
-                                  <p className="text-[10px] text-[#f9ab00] mt-2 font-medium">
-                                    ⚠ {conflicts.map(p => p.name).join(", ")}의 일정과 겹칩니다
+                                  <p className="mt-2 flex items-center gap-1 text-[10px] leading-[15px] font-medium text-[#D98B00]">
+                                    <ScheduleWarningGlyph />
+                                    <span>{warningPeople.map(p => p.name).join(", ")}의 일정 또는 근무 선호와 겹칩니다</span>
                                   </p>
                                 );
                               })()}
