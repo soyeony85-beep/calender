@@ -11,7 +11,7 @@ type ViewMode = "일" | "주" | "월";
 interface Project { id: string; name: string; phase: string; color: string; bg: string; members: number[]; custom?: boolean; }
 interface MeetingType { id: string; label: string; requiredRoles: string[] | null; optionalRoles?: string[] | null; custom?: boolean; }
 interface Person { id: number; name: string; role: string; initials: string; avatarColor: string; pref: string | null; prefType: "avoid" | "out" | "both" | null; avatarTemplate?: number; }
-interface SavedEvent { id: string; meetingId: string; title: string; date: Date; hour: number; duration: number; color: string; personId: number; urgent?: boolean; pendingInvite?: boolean; location?: string; description?: string; }
+interface SavedEvent { id: string; meetingId: string; title: string; date: Date; hour: number; duration: number; color: string; personId: number; urgent?: boolean; pendingInvite?: boolean; location?: string; description?: string; workLocationType?: "home" | "office" | "other" | "vacation"; }
 interface SampleEvent { id: string; title: string; dayOffset: number; startHour: number; duration: number; color: string; }
 interface EventOverride { dayOffset: number; startHour: number; }
 type DragEventRef = { source: "sample" | "saved"; id: string; meetingId?: string; duration: number };
@@ -31,6 +31,7 @@ type CalendarEventDetail = {
   source: "sample" | "saved";
   location?: string;
   description?: string;
+  workLocationType?: "home" | "office" | "other" | "vacation";
 };
 
 /* ── Data ── */
@@ -89,6 +90,8 @@ const SAMPLE_EVENTS: SampleEvent[] = [
   // ─ 월 (Jul 6) ─
   { id: "m1", title: "PO 위클리 미팅",        dayOffset: 1, startHour: 9,  duration: 1,   color: "#4285f4" }, // 이가영
   { id: "m2", title: "팀 주간 싱크",           dayOffset: 1, startHour: 10, duration: 1,   color: "#4396FB" }, // 윤소연
+  { id: "m2-po", title: "팀 주간 싱크",        dayOffset: 1, startHour: 10, duration: 1,   color: "#4285f4" }, // 이가영 참석
+  { id: "m2-be", title: "팀 주간 싱크",        dayOffset: 1, startHour: 10, duration: 1,   color: "#34a853" }, // 정지훈 참석
   { id: "m3", title: "사용자 인터뷰 준비",     dayOffset: 1, startHour: 11, duration: 1,   color: "#f9ab00" }, // 박은주
   { id: "m4", title: "디자인 시스템 정기 회의",dayOffset: 1, startHour: 14, duration: 1,   color: "#ea4335" }, // 윤지은
   { id: "m5", title: "BE 코드 리뷰",          dayOffset: 1, startHour: 15, duration: 1,   color: "#34a853" }, // 정지훈
@@ -104,6 +107,8 @@ const SAMPLE_EVENTS: SampleEvent[] = [
   // ─ 수 (Jul 8) ─
   { id: "w1", title: "리서치 발표",            dayOffset: 3, startHour: 10, duration: 1,   color: "#f9ab00" }, // 박은주
   { id: "w2", title: "스프린트 플래닝",        dayOffset: 3, startHour: 11, duration: 1,   color: "#4396FB" }, // 윤소연
+  { id: "w2-po", title: "스프린트 플래닝",     dayOffset: 3, startHour: 11, duration: 1,   color: "#4285f4" }, // 이가영 참석
+  { id: "w2-qa", title: "스프린트 플래닝",     dayOffset: 3, startHour: 11, duration: 1,   color: "#9334e6" }, // 최이영 참석
   { id: "w3", title: "제품 로드맵 검토",       dayOffset: 3, startHour: 14, duration: 1,   color: "#4285f4" }, // 이가영
   { id: "w4", title: "프로토타입 피드백",      dayOffset: 3, startHour: 14, duration: 1,   color: "#ea4335" }, // 윤지은 (overlap)
   { id: "w5", title: "DB 쿼리 최적화",         dayOffset: 3, startHour: 16, duration: 1,   color: "#34a853" }, // 정지훈
@@ -115,6 +120,7 @@ const SAMPLE_EVENTS: SampleEvent[] = [
 
   // ─ 금 (Jul 10) ─
   { id: "f1", title: "UX 워크숍",             dayOffset: 5, startHour: 9,  duration: 2,   color: "#ea4335" }, // 윤지은
+  { id: "f1-uxr", title: "UX 워크숍",          dayOffset: 5, startHour: 9,  duration: 2,   color: "#f9ab00" }, // 박은주 참석
   { id: "f2", title: "서버 배포 점검",         dayOffset: 5, startHour: 10, duration: 1,   color: "#34a853" }, // 정지훈
   { id: "f3", title: "백로그 정리",            dayOffset: 5, startHour: 11, duration: 1,   color: "#4285f4" }, // 이가영
   { id: "f4", title: "리서치 결과 공유",       dayOffset: 5, startHour: 14, duration: 1,   color: "#f9ab00" }, // 박은주
@@ -213,14 +219,14 @@ function WorkingLocationGlyph({ type, className = "w-5 h-5 shrink-0" }: { type: 
   if (type === "home") {
     return (
       <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-        <path d="M4 10.6 12 4l8 6.6v8.15c0 .69-.56 1.25-1.25 1.25H15v-5.2c0-.44-.36-.8-.8-.8h-4.4c-.44 0-.8.36-.8.8V20H5.25C4.56 20 4 19.44 4 18.75V10.6Z" fill="#0B57D0" />
+      <path d="M4 10.6 12 4l8 6.6v8.15c0 .69-.56 1.25-1.25 1.25H15v-5.2c0-.44-.36-.8-.8-.8h-4.4c-.44 0-.8.36-.8.8V20H5.25C4.56 20 4 19.44 4 18.75V10.6Z" fill="currentColor" />
       </svg>
     );
   }
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-      <path d="M5 4.75C5 4.34 5.34 4 5.75 4h8.5c.41 0 .75.34.75.75V20H5V4.75Z" fill="#0B57D0" />
-      <path d="M15 9h3.25c.41 0 .75.34.75.75V20h-4V9Z" fill="#0B57D0" opacity=".78" />
+      <path d="M5 4.75C5 4.34 5.34 4 5.75 4h8.5c.41 0 .75.34.75.75V20H5V4.75Z" fill="currentColor" />
+      <path d="M15 9h3.25c.41 0 .75.34.75.75V20h-4V9Z" fill="currentColor" opacity=".78" />
       <path d="M7.5 7h2v2h-2V7ZM11 7h2v2h-2V7ZM7.5 11h2v2h-2v-2ZM11 11h2v2h-2v-2ZM7.5 15h2v2h-2v-2ZM11 15h2v2h-2v-2Z" fill="white" opacity=".92" />
     </svg>
   );
@@ -677,6 +683,7 @@ export default function App() {
   const [eventOverrides, setEventOverrides] = useState<Record<string, EventOverride>>({});
   const [draggingEvent, setDraggingEvent] = useState<DragEventRef | null>(null);
   const [detailEvent, setDetailEvent] = useState<CalendarEventDetail | null>(null);
+  const [moveBlockedNotice, setMoveBlockedNotice] = useState(false);
   const [miniCalMonth, setMiniCalMonth] = useState(new Date(2026, 6, 1));
   const [addCalOpen, setAddCalOpen] = useState(false);
   const [addCalInput, setAddCalInput] = useState("");
@@ -1015,7 +1022,23 @@ export default function App() {
   }
 
   function handleSaveWorkingLocation() {
-    const label = workingLocation === "home" ? "재택근무" : workingLocation === "office" ? "오피스 근무" : workingLocation === "vacation" ? "휴가" : "외근";
+    const label = workingLocation === "home" ? "집" : workingLocation === "office" ? "Office" : workingLocation === "vacation" ? "휴가" : "외근";
+    if (!isAllDay) {
+      const meetingId = `work-location-${Date.now()}`;
+      const duration = Math.max(0.5, endH + endM / 60 - startH - startM / 60);
+      setSavedEvents(prev => [...prev, {
+        id: `${meetingId}-${ORGANIZER.id}`,
+        meetingId,
+        title: label,
+        date: popupDate,
+        hour: startH + startM / 60,
+        duration,
+        color: ORGANIZER.avatarColor,
+        personId: ORGANIZER.id,
+        location: label,
+        workLocationType: workingLocation,
+      }]);
+    }
     setMyPrefs(prev => ({
       ...prev,
       oooDays: workingLocation === "other"
@@ -1118,16 +1141,19 @@ export default function App() {
   function sampleAttendeeIds(ev: CalendarEventDetail) {
     const title = ev.title;
     const withOwner = (ids: number[]) => {
-      const filtered = ev.personId === ORGANIZER.id ? ids : ids.filter(id => id !== ORGANIZER.id);
-      return [ev.personId, ...filtered].filter((id, idx, arr) => arr.indexOf(id) === idx);
+      const participants = ev.personId === ORGANIZER.id ? ids : [ORGANIZER.id, ...ids];
+      return [ev.personId, ...participants].filter((id, idx, arr) => arr.indexOf(id) === idx);
     };
 
-    if (title.includes("릴리즈") || title.includes("배포") || title.includes("QA")) return withOwner([1, 2, 4, 5]);
-    if (title.includes("API") || title.includes("DB") || title.includes("BE") || title.includes("서버")) return withOwner([1, 4, 5]);
-    if (title.includes("UX") || title.includes("리서치") || title.includes("인터뷰") || title.includes("사용성")) return withOwner([1, 3]);
-    if (title.includes("디자인") || title.includes("프로토타입")) return withOwner([1, 2, 3]);
-    if (title.includes("스프린트") || title.includes("싱크") || title.includes("위클리")) return withOwner([1, 2, 4, 5]);
-    return withOwner([1, 2]);
+    if (title.includes("팀 주간 싱크")) return withOwner([1, 4]);
+    if (title.includes("스프린트 플래닝")) return withOwner([1, 5]);
+    if (title.includes("UX 워크숍")) return withOwner([2, 3]);
+    if (title.includes("릴리즈") || title.includes("배포") || title.includes("QA")) return withOwner([4, 5]);
+    if (title.includes("API") || title.includes("DB") || title.includes("BE") || title.includes("서버")) return withOwner([4]);
+    if (title.includes("UX") || title.includes("리서치") || title.includes("인터뷰") || title.includes("사용성")) return withOwner([2, 3]);
+    if (title.includes("디자인") || title.includes("프로토타입")) return withOwner([2]);
+    if (title.includes("위클리")) return withOwner([1]);
+    return withOwner([1]);
   }
 
   function detailAttendees(ev: CalendarEventDetail): { person: ReturnType<typeof personById>; status: AttendanceStatus }[] {
@@ -1140,12 +1166,18 @@ export default function App() {
         }));
       }
     }
-    return sampleAttendeeIds(ev).map((id) => ({
-      person: personById(id),
-      // 샘플 캘린더에 실제 일정 카드가 있는 소유자만 수락 상태로 표시한다.
-      // 초대되었지만 해당 팀원의 캘린더에 일정이 없는 참석자는 거절(X) 상태다.
-      status: id === ev.personId ? "accepted" : "declined",
-    }));
+    return sampleAttendeeIds(ev).map((id) => {
+      const hasCalendarCard = SAMPLE_EVENTS.some(item =>
+        item.title === ev.title &&
+        item.dayOffset === ev.dayOffset &&
+        item.startHour === ev.startHour &&
+        COLOR_TO_PID[item.color] === id
+      );
+      return {
+        person: personById(id),
+        status: id === ev.personId || hasCalendarCard ? "accepted" : "declined",
+      };
+    });
   }
 
   function moveDraggedEvent(dayIdx: number, hour: number) {
@@ -1182,7 +1214,7 @@ export default function App() {
       .filter(e => e.dayOffset === dayIdx && isEventVisible(e));
     const saved = savedEvents
       .filter(e => e.date.getDate() === wd?.getDate() && e.date.getMonth() === wd?.getMonth() && isEventVisible(e))
-      .map(e => ({ id: e.id, meetingId: e.meetingId, title: e.title, date: e.date, dayOffset: dayIdx, startHour: e.hour, duration: e.duration, color: e.color, personId: e.personId, urgent: e.urgent, pendingInvite: e.pendingInvite, location: e.location, description: e.description, source: "saved" as const }));
+      .map(e => ({ id: e.id, meetingId: e.meetingId, title: e.title, date: e.date, dayOffset: dayIdx, startHour: e.hour, duration: e.duration, color: e.color, personId: e.personId, urgent: e.urgent, pendingInvite: e.pendingInvite, location: e.location, description: e.description, workLocationType: e.workLocationType, source: "saved" as const }));
     return [...sample, ...saved];
   }
 
@@ -1633,27 +1665,39 @@ export default function App() {
                                     : `calc(3px + ${ev.column} * ((100% - ${totalMargin}px) / ${ev.columns} + ${GAP}px))`;
                                   return (
                                     <div key={ev.id}
-                                      draggable={canDrag}
+                                      draggable
                                       onClick={e => { e.stopPropagation(); openEventDetail(ev); }}
                                       onDragStart={e => {
-                                        if (!canDrag) return;
+                                        if (!canDrag) {
+                                          e.preventDefault();
+                                          e.stopPropagation();
+                                          setMoveBlockedNotice(true);
+                                          window.setTimeout(() => setMoveBlockedNotice(false), 2400);
+                                          return;
+                                        }
                                         e.stopPropagation();
                                         setDraggingEvent({ source: ev.source, id: ev.id, meetingId: (ev as { meetingId?: string }).meetingId, duration: ev.duration });
                                         e.dataTransfer.effectAllowed = "move";
                                       }}
                                       onDragEnd={() => setDraggingEvent(null)}
-                                      className={`absolute top-0.5 rounded-[10px] z-20 overflow-hidden transition-opacity ${canDrag ? "cursor-grab active:cursor-grabbing" : ""} ${draggingEvent?.id === ev.id ? "opacity-45" : ""} ${!pendingInvite && ev.columns > 1 ? "border border-white" : ""}`}
+                                      className={`absolute top-0.5 rounded-[10px] z-20 overflow-hidden transition-opacity ${canDrag ? "cursor-grab active:cursor-grabbing" : "cursor-not-allowed"} ${draggingEvent?.id === ev.id ? "opacity-45" : ""} ${!pendingInvite && ev.columns > 1 ? "border border-white" : ""}`}
                                       style={{
                                         left: leftCalc,
                                         width: widthCalc,
                                         height: `${ev.duration * 64 - 4}px`,
-                                        backgroundColor: pendingInvite ? "#fff" : bg,
+                                        backgroundColor: ev.workLocationType ? "#fff" : pendingInvite ? "#fff" : bg,
                                         border: pendingInvite ? `1.5px dashed ${ev.color}55` : undefined,
+                                        borderLeft: ev.workLocationType ? "3px solid #D9F1FF" : undefined,
                                         borderRadius: "10px",
                                         padding: ev.columns >= 5 ? "6px 5px" : pendingInvite ? "7.5px 8.5px" : "6px 7px",
                                       }}>
                                       <div className="flex items-center gap-1 min-w-0">
                                         {(ev as { urgent?: boolean }).urgent && <img src={EMERGENCY_ICON} alt="" className="w-3 h-3 shrink-0" draggable={false} />}
+                                        {ev.workLocationType && (
+                                          <span className="w-5 h-5 -ml-1 rounded-full bg-[#E5F6FF] text-[#18A8E8] flex items-center justify-center shrink-0">
+                                            {ev.workLocationType === "office" ? <WorkingLocationGlyph type="office" className="w-3 h-3" /> : ev.workLocationType === "home" ? <WorkingLocationGlyph type="home" className="w-3 h-3" /> : ev.workLocationType === "other" ? <OffsiteCarGlyph /> : <span className="text-[10px]">🏝️</span>}
+                                          </span>
+                                        )}
                                         <p className="text-[10px] font-semibold leading-[12.5px] truncate"
                                           style={{ color: text }}>{ev.title}</p>
                                       </div>
@@ -1917,7 +1961,7 @@ export default function App() {
                               <div className="flex-1 min-w-0 flex items-center gap-2">
                                 <span className="text-[15px] leading-5 font-semibold text-[#202124] truncate">{person.name}</span>
                                 <span className="text-[10px] leading-[15px] font-semibold px-[6px] py-[2px] rounded-[4px] bg-[#E9EDF2] text-[#5f6368] shrink-0">
-                                  {person.id === ORGANIZER.id ? "주최자" : "role" in person ? person.role : ""}
+                                  {person.id === owner.id ? "주최자" : person.id === ORGANIZER.id ? "PD" : "role" in person ? person.role : ""}
                                 </span>
                               </div>
                             </div>
@@ -2033,23 +2077,23 @@ export default function App() {
                       근무 시간 적용
                     </label>
 
-                    <p className="text-xs font-medium text-[#3c4043] mb-3">근무장소 선택</p>
-                    <div className="space-y-2">
+                    <p className="w-[320px] text-xs leading-7 font-medium text-[#3c4043] mb-2">근무장소 선택</p>
+                    <div className="space-y-2 min-w-[355px]">
                       {["일요일","월요일","화요일","수요일","목요일","금요일","토요일"].map((day, dayNum) => workDays.includes(dayNum) && (
-                        <div key={day} className="flex items-center gap-3 h-8 relative">
+                        <div key={day} className="flex items-center gap-3 h-8 relative whitespace-nowrap">
                           <span className="w-[41px] text-sm font-medium text-black text-center shrink-0">{day}</span>
-                          {applyWorkHours && <>
-                            <button className="h-8 px-3 rounded-[10px] bg-[#f1f3f4] text-sm font-medium text-[#5f6368]">오전 9:00</button>
-                            <span className="text-sm text-[#5f6368]">–</span>
-                            <button className="h-8 px-3 rounded-[10px] bg-[#f1f3f4] text-sm font-medium text-[#5f6368]">오후 6:00</button>
-                          </>}
+                          {applyWorkHours && <div className="w-[187px] h-8 shrink-0 flex items-center gap-2">
+                            <button className="h-8 px-3 rounded-[10px] bg-[#f1f3f4] text-sm leading-5 font-medium text-[#5f6368] whitespace-nowrap">오전 9:00</button>
+                            <span className="text-sm text-[#5f6368] shrink-0">–</span>
+                            <button className="h-8 px-3 rounded-[10px] bg-[#f1f3f4] text-sm leading-5 font-medium text-[#5f6368] whitespace-nowrap">오후 6:00</button>
+                          </div>}
                           <button onClick={() => setWorkLocationMenuDay(v => v === dayNum ? null : dayNum)}
-                            className="h-8 min-w-[103px] px-3 rounded-[10px] bg-[#f1f3f4] flex items-center gap-2 text-sm font-medium text-[#5f6368]">
+                            className="h-8 min-w-[103px] px-3 rounded-[10px] bg-[#f1f3f4] flex items-center gap-2 text-sm leading-5 font-medium text-[#5f6368] whitespace-nowrap">
                             <span className="w-3 h-3 flex items-center justify-center text-[11px]">{workLocations[dayNum] === "오피스" ? "🏢" : workLocations[dayNum] === "외근" ? <OffsiteCarGlyph /> : workLocations[dayNum] === "집" ? "🏠" : "🏝️"}</span>
                             <span>{workLocations[dayNum]}</span><ChevronDown size={14} className="ml-auto" />
                           </button>
                           {workLocationMenuDay === dayNum && (
-                            <div className={`absolute left-[53px] z-20 w-[130px] max-h-[168px] overflow-y-auto rounded-[10px] border border-[#e8eaed] bg-white py-1 shadow-xl ${dayNum >= 4 ? "bottom-9" : "top-9"}`}>
+                            <div className={`absolute z-20 w-[130px] max-h-[168px] overflow-y-auto rounded-[10px] border border-[#e8eaed] bg-white py-1 shadow-xl ${applyWorkHours ? "left-[252px]" : "left-[53px]"} ${dayNum >= 4 ? "bottom-9" : "top-9"}`}>
                               {["오피스", "외근", "집", "휴가"].map(location => (
                                 <button key={location} onClick={() => { setWorkLocations(v => v.map((x, n) => n === dayNum ? location : x)); setWorkLocationMenuDay(null); }} className="w-full px-3 py-2 flex items-center gap-2 text-sm text-[#5f6368] hover:bg-[#f1f3f4]">
                                   <span className="w-3 flex justify-center">{location === "오피스" ? "🏢" : location === "외근" ? <OffsiteCarGlyph /> : location === "집" ? "🏠" : "🏝️"}</span>{location}
@@ -2146,7 +2190,9 @@ export default function App() {
                     </div>
 
                     <div className="flex items-start gap-4 mt-9">
-                      <SuitcaseGlyph />
+                      <div className="w-6 h-6 shrink-0 pt-0.5 flex items-start justify-center [&>svg]:w-6 [&>svg]:h-6">
+                        <SuitcaseGlyph />
+                      </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-[14px] leading-7 font-medium text-[#3c4043]">근무장소 선택</p>
                         <div className="mt-2 flex flex-wrap gap-2">
@@ -2749,6 +2795,15 @@ export default function App() {
                 <button onClick={activeTab === "근무장소 설정" ? handleSaveWorkingLocation : handleSave} className="px-6 py-2.5 rounded-full bg-[#4396FB] text-white text-[14px] leading-5 font-semibold hover:bg-[#2F7FE6] transition-colors shadow-[0px_1px_1.5px_rgba(0,0,0,0.1),0px_1px_1px_rgba(0,0,0,0.1)]">저장</button>
               </div>
             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {moveBlockedNotice && (
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}
+            className="fixed left-1/2 bottom-7 -translate-x-1/2 z-[80] rounded-[12px] bg-[#313d4c] px-4 py-3 text-[14px] leading-5 font-medium text-white shadow-xl">
+            내가 만든 회의만 이동할 수 있어요
           </motion.div>
         )}
       </AnimatePresence>
