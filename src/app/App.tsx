@@ -416,22 +416,26 @@ function SchedulePreview({ participants, dayOffset, sampleEvents, selStartH, sel
   return (
     <div>
       {/* Hour markers */}
-      <div className="flex ml-7 mb-1">
+      <div className="flex ml-8 mb-1">
         {Array.from({ length: RANGE + 1 }, (_, i) => H_START + i).map(h => (
           <div key={h} className="flex-1 text-[8px] text-[#c5c7c5] -translate-x-1/2">{h}</div>
         ))}
       </div>
 
-      <div className="relative space-y-1.5">
+      <div className="relative flex flex-col gap-1.5">
         {/* Selected time highlight band */}
-        <div className="absolute inset-y-0 z-20 pointer-events-none rounded"
-          style={{
-            left: `calc(1.75rem + ${selLeft}%)`,
-            width: `${selWidth}%`,
-            backgroundColor: "#4396FB12",
-            borderLeft: "2px solid #4396FB66",
-            borderRight: "2px solid #4396FB66",
-          }} />
+        <div className="absolute inset-y-0 left-8 right-0 z-20 pointer-events-none">
+          <div
+            className="absolute inset-y-0"
+            style={{
+              left: `${selLeft}%`,
+              width: `${selWidth}%`,
+              backgroundColor: "#4396FB12",
+              borderLeft: "2px solid #4396FB66",
+              borderRight: "2px solid #4396FB66",
+              boxSizing: "border-box",
+            }} />
+        </div>
 
         {participants.map(p => {
           const evs = dayOffset >= 0
@@ -652,20 +656,24 @@ function AttendanceAvatar({ person, status, size = 36 }: {
 }) {
   const statusStyle = {
     accepted: { bg: "#34A853", label: "수락", mark: <Check size={9} strokeWidth={3.2} /> },
-    pending: { bg: "#F9AB00", label: "대기", mark: <span className="block w-1.5 h-1.5 rounded-full bg-white" /> },
+    pending: { bg: "transparent", label: "미정", mark: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <circle cx="7.80039" cy="7.80002" r="6.9" fill="#9AA0A6" stroke="white" />
+        <path d="M7.78044 9.46119C7.44827 9.46119 7.17915 9.19206 7.17915 8.8599C7.17915 7.88114 7.77512 7.40618 8.20982 7.05934C8.55995 6.78009 8.76173 6.60666 8.83515 6.28716C8.89465 6.02791 8.84984 5.80892 8.69743 5.61777C8.4997 5.36966 8.13133 5.20257 7.78044 5.20257C7.32295 5.20257 6.92395 5.49549 6.78775 5.93145C6.75661 6.0312 6.74066 6.13576 6.74066 6.24235C6.74066 6.57451 6.47153 6.84363 6.13937 6.84363C5.80721 6.84363 5.53809 6.57451 5.53809 6.24235C5.53809 6.01373 5.57252 5.78841 5.63986 5.57245C5.93379 4.63217 6.79408 4 7.78018 4C8.49945 4 9.21137 4.33292 9.63796 4.86864C10.0167 5.34409 10.1479 5.94361 10.0068 6.55628C9.83594 7.30061 9.34985 7.68822 8.95921 7.99987C8.55843 8.31938 8.38147 8.4766 8.38147 8.8599C8.38147 9.19206 8.1126 9.46119 7.78044 9.46119Z" fill="white" />
+        <path d="M7.78895 10.1721C7.28413 10.1721 6.875 10.5812 6.875 11.0861C6.875 11.5909 7.28413 12 7.78895 12C8.29378 12 8.70291 11.5909 8.70291 11.0861C8.70291 10.5812 8.29378 10.1721 7.78895 10.1721Z" fill="white" />
+      </svg>
+    ) },
     declined: { bg: "#EA4335", label: "거절", mark: <X size={9} strokeWidth={3.2} /> },
   }[status];
 
   return (
-    <div className="relative shrink-0" title={status === "pending" ? person.name : `${person.name} · ${statusStyle.label}`}>
+    <div className="relative shrink-0" title={`${person.name} · ${statusStyle.label}`}>
       <ProfileAvatar person={person} size={size} />
-      {status !== "pending" && (
-        <span
-          className="absolute left-[22px] top-[22px] w-4 h-4 rounded-full border border-white flex items-center justify-center p-px text-white"
-          style={{ backgroundColor: statusStyle.bg }}>
-          {statusStyle.mark}
-        </span>
-      )}
+      <span
+        className={`absolute left-[22px] top-[22px] w-4 h-4 rounded-full flex items-center justify-center text-white ${status === "pending" ? "" : "border border-white"}`}
+        style={{ backgroundColor: statusStyle.bg }}>
+        {statusStyle.mark}
+      </span>
     </div>
   );
 }
@@ -685,6 +693,7 @@ export default function App() {
   const [eventOverrides, setEventOverrides] = useState<Record<string, EventOverride>>({});
   const [draggingEvent, setDraggingEvent] = useState<DragEventRef | null>(null);
   const [detailEvent, setDetailEvent] = useState<CalendarEventDetail | null>(null);
+  const [meetingResponses, setMeetingResponses] = useState<Record<string, AttendanceStatus>>({});
   const [moveBlockedNotice, setMoveBlockedNotice] = useState(false);
   const [allDayVacationDates, setAllDayVacationDates] = useState<string[]>([]);
   const [allDayWorkLocations, setAllDayWorkLocations] = useState<Record<string, "오피스" | "외근" | "집">>({});
@@ -1155,6 +1164,7 @@ export default function App() {
   }
 
   function eventOwner(ev: CalendarEventDetail) {
+    if (ev.source === "saved") return ORGANIZER;
     return personById(ev.personId);
   }
 
@@ -1197,16 +1207,21 @@ export default function App() {
   }
 
   function detailAttendees(ev: CalendarEventDetail): { person: ReturnType<typeof personById>; status: AttendanceStatus }[] {
+    const responseKey = ev.meetingId ?? ev.id;
+    const applyMyResponse = (rows: { person: ReturnType<typeof personById>; status: AttendanceStatus }[]) =>
+      rows.map(row => row.person.id === ORGANIZER.id && meetingResponses[responseKey]
+        ? { ...row, status: meetingResponses[responseKey] }
+        : row);
     if (ev.source === "saved" && ev.meetingId) {
       const group = savedEvents.filter(item => item.meetingId === ev.meetingId);
       if (group.length > 0) {
-        return group.map((item, idx) => ({
+        return applyMyResponse(group.map((item, idx) => ({
           person: personById(item.personId),
           status: item.personId === ORGANIZER.id ? "accepted" : item.pendingInvite ? "pending" : "accepted",
-        }));
+        })));
       }
     }
-    return sampleAttendeeIds(ev).map((id) => {
+    return applyMyResponse(sampleAttendeeIds(ev).map((id) => {
       const hasCalendarCard = SAMPLE_EVENTS.some(item =>
         item.title === ev.title &&
         item.dayOffset === ev.dayOffset &&
@@ -1217,7 +1232,7 @@ export default function App() {
         person: personById(id),
         status: id === ev.personId || hasCalendarCard ? "accepted" : "declined",
       };
-    });
+    }));
   }
 
   function moveDraggedEvent(dayIdx: number, hour: number) {
@@ -1715,14 +1730,7 @@ export default function App() {
                                   const pendingInvite = (ev as { pendingInvite?: boolean }).pendingInvite;
                                   const canDrag = isOwnEvent(ev);
                                   const isLocationRail = Boolean(ev.workLocationType);
-                                  const locationPastel = ev.workLocationType === "home" ? "#EAF7F0"
-                                    : ev.workLocationType === "other" ? "#FFF4E5"
-                                    : ev.workLocationType === "vacation" ? "#F6F7E3"
-                                    : "#EAF4FF";
-                                  const locationAccent = ev.workLocationType === "home" ? "#CFEBDD"
-                                    : ev.workLocationType === "other" ? "#FFE5BD"
-                                    : ev.workLocationType === "vacation" ? "#E8EBB8"
-                                    : "#CFE6FF";
+                                  const locationPastel = "#EAF4FF";
                                   const regularIndex = regularEvents.findIndex(item => item.id === ev.id);
                                   const overlapColumns = hasWorkLocationOverlap ? Math.max(1, regularEvents.length) : ev.columns;
                                   const totalMargin = (hasWorkLocationOverlap ? 29 : 6) + (overlapColumns - 1) * GAP;
@@ -1976,6 +1984,9 @@ export default function App() {
         {detailEvent && (() => {
           const { owner, location, description } = eventDetailMeta(detailEvent);
           const attendees = detailAttendees(detailEvent);
+          const responseKey = detailEvent.meetingId ?? detailEvent.id;
+          const myAttendance = attendees.find(item => item.person.id === ORGANIZER.id)?.status ?? "pending";
+          const isInvitedMeeting = owner.id !== ORGANIZER.id && attendees.some(item => item.person.id === ORGANIZER.id);
           return (
             <motion.div
               initial={{ opacity: 0 }}
@@ -2060,6 +2071,27 @@ export default function App() {
                     </div>
                   </div>
                 </div>
+                {isInvitedMeeting && (
+                  <div className="flex items-center justify-end gap-3 px-5 pt-8 pb-5">
+                    {([
+                      ["accepted", "참석"],
+                      ["declined", "불참"],
+                      ["pending", "미정"],
+                    ] as const).map(([status, label]) => {
+                      const active = myAttendance === status;
+                      return (
+                        <button
+                          key={status}
+                          type="button"
+                          onClick={() => setMeetingResponses(prev => ({ ...prev, [responseKey]: status }))}
+                          className={`h-10 rounded-full flex items-center justify-center gap-2 text-[14px] leading-5 font-semibold transition-colors ${active ? "px-6 bg-[#4396FB] text-white shadow-[0px_1px_0.75px_rgba(0,0,0,0.1),0px_1px_0.5px_rgba(0,0,0,0.1)]" : "px-[25px] bg-white border border-[#dadce0] text-[#5f6368] hover:bg-[#f8f9fa]"}`}>
+                          <span>{label}</span>
+                          {status === "accepted" && active && <ChevronDown size={14} strokeWidth={2} />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </motion.div>
             </motion.div>
           );
@@ -2433,9 +2465,10 @@ export default function App() {
                       })}
                     </div>
                     {/* + 프로젝트 추가 */}
-                    <AnimatePresence>
+                    <AnimatePresence initial={false} mode="wait">
                       {addProjectOpen ? (
-                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
+                        <motion.div key="project-form" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.24, ease: [0.4, 0, 0.2, 1] }}
                           className="overflow-hidden mt-2">
                           <div className="bg-[#f8f9fa] rounded-xl p-3 space-y-3 border border-[#e8eaed]">
                             {/* Name */}
@@ -2582,9 +2615,10 @@ export default function App() {
                         })}
                         </div>
                       </div>
-                      <AnimatePresence>
+                      <AnimatePresence initial={false} mode="wait">
                         {addTypeOpen ? (
-                          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
+                          <motion.div key="meeting-type-form" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.24, ease: [0.4, 0, 0.2, 1] }} className="overflow-hidden">
                             <div className="mt-1 rounded-xl border border-[#e8eaed] bg-[#f8f9fa] p-3 space-y-3">
                               <input autoFocus type="text" value={addTypeInput} onChange={e => setAddTypeInput(e.target.value)}
                                 onKeyDown={e => { if (e.key === "Enter") addMeetingType(); if (e.key === "Escape") closeAddMeetingType(); }}
