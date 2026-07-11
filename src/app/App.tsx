@@ -183,6 +183,17 @@ function OffsiteCarGlyph() {
   );
 }
 
+function VacationGlyph({ className = "w-3 h-3 shrink-0" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 12 12" fill="none" className={className} aria-hidden="true">
+      <path d="M1.25 10.15c1.35-.72 2.82-1.08 4.42-1.08 1.58 0 3.27.36 5.08 1.08-.38.7-1.08 1.1-1.9 1.1H3.12c-.82 0-1.5-.4-1.87-1.1Z" fill="#F4C75B"/>
+      <path d="M6.22 9.35c.1-2.18-.12-3.93-.68-5.25" stroke="#8B6A4E" strokeWidth="1.05" strokeLinecap="round"/>
+      <path d="M5.58 4.2C4.02 3.98 3 3.2 2.53 1.88c1.45-.2 2.58.33 3.38 1.57C6.15 2 6.9 1.05 8.15.58c.37 1.48-.17 2.62-1.62 3.43 1.3-.46 2.48-.18 3.54.84-1.12.92-2.32 1.02-3.6.3" fill="#69B96B"/>
+      <path d="M5.58 4.2C4.02 3.98 3 3.2 2.53 1.88c1.45-.2 2.58.33 3.38 1.57C6.15 2 6.9 1.05 8.15.58c.37 1.48-.17 2.62-1.62 3.43 1.3-.46 2.48-.18 3.54.84-1.12.92-2.32 1.02-3.6.3" stroke="#4D9D58" strokeWidth=".35" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+
 function PreferenceGlyph({ className = "shrink-0" }: { className?: string }) {
   return (
     <svg width="14" height="14" viewBox="1 32 24 24" fill="none" className={className} aria-hidden="true">
@@ -266,8 +277,9 @@ const TIMEZONE_OPTIONS = [
 
 /* ── Helpers ── */
 function fmtTime(h: number, m: number) {
-  const period = h < 12 ? "오전" : "오후";
-  const dh = h === 0 ? 12 : h > 12 ? h - 12 : h;
+  const normalizedHour = ((h % 24) + 24) % 24;
+  const period = normalizedHour < 12 ? "오전" : "오후";
+  const dh = normalizedHour === 0 ? 12 : normalizedHour > 12 ? normalizedHour - 12 : normalizedHour;
   return `${period} ${dh}:${m === 0 ? "00" : m}`;
 }
 function fmtDateShort(d: Date) {
@@ -715,7 +727,7 @@ export default function App() {
   const [myPrefsTab, setMyPrefsTab] = useState<"meeting" | "ooo">("ooo");
   const [applyWorkHours, setApplyWorkHours] = useState(false);
   const [workDays, setWorkDays] = useState([1, 2, 3, 4, 5]);
-  const [workLocations, setWorkLocations] = useState(["오피스", "오피스", "오피스", "오피스", "외근", "집", "오피스"]);
+  const [workLocations, setWorkLocations] = useState(["오피스", "오피스", "오피스", "오피스", "오피스", "오피스", "오피스"]);
   const [savedWorkLocations, setSavedWorkLocations] = useState<Record<number, string>>({});
   const [workLocationMenuDay, setWorkLocationMenuDay] = useState<number | null>(null);
   const [myPrefs, setMyPrefs] = useState({
@@ -755,6 +767,12 @@ export default function App() {
   const [locationVal, setLocationVal] = useState("");
   const [descriptionVal, setDescriptionVal] = useState("");
   const [workingLocation, setWorkingLocation] = useState<"home" | "office" | "other" | "vacation" | null>(null);
+  const [attendeeQuery, setAttendeeQuery] = useState("");
+  const [attendeeSearchOpen, setAttendeeSearchOpen] = useState(false);
+  const [addedAttendeeIds, setAddedAttendeeIds] = useState<number[]>([]);
+  const [awayAutoCancel, setAwayAutoCancel] = useState(true);
+  const [awayCancelScope, setAwayCancelScope] = useState<"existing" | "all">("all");
+  const [taskDeadline, setTaskDeadline] = useState("");
 
   /* ── Project / Meeting type (extendable) ── */
   const [projects, setProjects] = useState<Project[]>(DEFAULT_PROJECTS);
@@ -961,7 +979,8 @@ export default function App() {
       };
     });
   }, [weekOffset]);
-  const hours = Array.from({ length: 23 }, (_, i) => i + 1);
+  // 오전 1시부터 다음 날 자정(오전 12시)까지 하루 전체 시간축을 표시합니다.
+  const hours = Array.from({ length: 24 }, (_, i) => i + 1);
   const miniDays = getMiniCalDays(miniCalMonth);
 
   useEffect(() => {
@@ -991,7 +1010,11 @@ export default function App() {
   function openPopup(date: Date, hour: number) {
     setPopupDate(date); setStartH(hour); setStartM(0); setEndH(hour + 1); setEndM(0);
     setPopupTitle(""); setProjectId(null); setMeetingTypeId(null); setRoomVal(""); setRoomSearch(""); setLocationVal(""); setDescriptionVal("");
+    setAttendeeQuery(""); setAttendeeSearchOpen(false); setAddedAttendeeIds([]);
     setWorkingLocation(null);
+    setAwayAutoCancel(true);
+    setAwayCancelScope("all");
+    setTaskDeadline("");
     setRoomListExpanded(true);
     setLocationMode("none");
     setIsAllDay(false); setRepeatVal("반복 안 함"); setActiveTab("일정");
@@ -1013,6 +1036,7 @@ export default function App() {
       { id: ORGANIZER.id, color: ORGANIZER.avatarColor },
       ...requiredPeople.map(p => ({ id: p.id, color: p.avatarColor })),
       ...optionalPeople.map(p => ({ id: p.id, color: p.avatarColor })),
+      ...allPeople.filter(p => addedAttendeeIds.includes(p.id)).map(p => ({ id: p.id, color: p.avatarColor })),
     ];
 
     // Deduplicate by id
@@ -1036,6 +1060,23 @@ export default function App() {
         description: descriptionVal,
       })),
     ]);
+    setPopupOpen(false);
+  }
+
+  function handleSaveTask() {
+    const taskId = `task-${Date.now()}`;
+    const duration = Math.max(0.5, endH + endM / 60 - startH - startM / 60);
+    setSavedEvents(prev => [...prev, {
+      id: `${taskId}-${ORGANIZER.id}`,
+      meetingId: taskId,
+      title: popupTitle.trim() || "새 할 일",
+      date: popupDate,
+      hour: startH + startM / 60,
+      duration: isAllDay ? 1 : duration,
+      color: ORGANIZER.avatarColor,
+      personId: ORGANIZER.id,
+      description: [descriptionVal.trim(), taskDeadline ? `마감일: ${taskDeadline}` : ""].filter(Boolean).join(" · "),
+    }]);
     setPopupOpen(false);
   }
 
@@ -1081,6 +1122,36 @@ export default function App() {
         : prev.oooDays,
     }));
     setLocationVal(label);
+    setPopupOpen(false);
+  }
+
+  function handleSaveAway() {
+    const key = localDateKey(popupDate);
+    if (isAllDay) {
+      setAllDayVacationDates(prev => prev.includes(key) ? prev : [...prev, key]);
+    } else {
+      const meetingId = `away-${Date.now()}`;
+      const duration = Math.max(0.5, endH + endM / 60 - startH - startM / 60);
+      setSavedEvents(prev => [...prev, {
+        id: `${meetingId}-${ORGANIZER.id}`,
+        meetingId,
+        title: "자리 비움",
+        date: popupDate,
+        hour: startH + startM / 60,
+        duration,
+        color: ORGANIZER.avatarColor,
+        personId: ORGANIZER.id,
+        location: "자리 비움",
+        workLocationType: "vacation",
+      }]);
+    }
+    if (awayAutoCancel) setCancelledMeetingDates(prev => prev.includes(key) ? prev : [...prev, key]);
+    setAllDayWorkLocations(prev => {
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
+    setLocationVal("자리 비움");
     setPopupOpen(false);
   }
 
@@ -1685,15 +1756,15 @@ export default function App() {
                       {myWorkLocation && (
                         <div className="mt-1 min-h-6 flex items-center gap-1.5 text-[10px] leading-[15px] font-semibold text-[#4E5968]">
                           <span className="w-6 h-6 rounded-[7px] bg-[#4396FB24] flex items-center justify-center">
-                            {myWorkLocation === "외근" ? <OffsiteCarGlyph /> : myWorkLocation === "오피스" ? <WorkingLocationGlyph type="office" /> : myWorkLocation === "집" ? <WorkingLocationGlyph type="home" /> : <span>🏝️</span>}
+                            {myWorkLocation === "외근" ? <OffsiteCarGlyph /> : myWorkLocation === "오피스" ? <WorkingLocationGlyph type="office" /> : myWorkLocation === "집" ? <WorkingLocationGlyph type="home" /> : <VacationGlyph />}
                           </span>
                           <span>{myWorkLocation}</span>
                         </div>
                       )}
                       {myVacationToday && (
                         <div className="mt-1 min-h-6 flex items-center gap-1.5 text-[10px] leading-[15px] font-semibold text-[#4E5968]">
-                          <span className="w-6 h-6 rounded-[7px] flex items-center justify-center text-[11px]" style={{ backgroundColor: `${ORGANIZER.avatarColor}24` }}>🏝️</span>
-                          <span>휴가</span>
+                          <span className="w-6 h-6 rounded-[7px] flex items-center justify-center" style={{ backgroundColor: `${ORGANIZER.avatarColor}24` }}><VacationGlyph /></span>
+                          <span>자리 비움</span>
                         </div>
                       )}
                     </div>
@@ -1703,7 +1774,7 @@ export default function App() {
               <div ref={calendarScrollRef} className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "thin" }}>
                 {hours.map(hour => (
                   <div key={hour} className="flex" style={{ height: "64px" }}>
-                    <div className="w-16 shrink-0 relative"><span className="absolute -top-2.5 right-2.5 text-[10px] text-[#9aa0a6] whitespace-nowrap">{fmtTime(hour, 0)}</span></div>
+                    <div className="w-16 shrink-0 relative"><span className={`absolute right-2.5 text-[10px] text-[#9aa0a6] whitespace-nowrap ${hour === 1 ? "top-2" : "-top-2.5"}`}>{fmtTime(hour, 0)}</span></div>
                     {weekDays.map((day, dayIdx) => {
                       const isWknd = day.getDay() === 0 || day.getDay() === 6;
                       const isLunch = hour === 13;
@@ -1783,7 +1854,7 @@ export default function App() {
                                         {(ev as { urgent?: boolean }).urgent && <img src={EMERGENCY_ICON} alt="" className="w-3 h-3 shrink-0" draggable={false} />}
                                         {ev.workLocationType && (
                                           <span className={`${isLocationRail ? "w-5 h-5" : "w-5 h-5 -ml-1"} rounded-[4px] text-[#1888E9] flex items-center justify-center shrink-0`} style={{ backgroundColor: isLocationRail ? "transparent" : locationPastel }}>
-                                            {ev.workLocationType === "office" ? <WorkingLocationGlyph type="office" className="w-3 h-3" /> : ev.workLocationType === "home" ? <WorkingLocationGlyph type="home" className="w-3 h-3" /> : ev.workLocationType === "other" ? <OffsiteCarGlyph /> : <span className="text-[10px]">🏝️</span>}
+                                            {ev.workLocationType === "office" ? <WorkingLocationGlyph type="office" className="w-3 h-3" /> : ev.workLocationType === "home" ? <WorkingLocationGlyph type="home" className="w-3 h-3" /> : ev.workLocationType === "other" ? <OffsiteCarGlyph /> : <VacationGlyph />}
                                           </span>
                                         )}
                                         {!isLocationRail && <p className={`text-[10px] font-semibold leading-[12.5px] truncate ${meetingsCancelled ? "line-through opacity-55" : ""}`}
@@ -1891,7 +1962,7 @@ export default function App() {
                   const evs = cellEvents(0, hour); const isLunch = hour === 13;
                   return (
                     <div key={hour} className="flex" style={{ height: "80px" }}>
-                      <div className="w-16 shrink-0 relative"><span className="absolute -top-2.5 right-2.5 text-[10px] text-[#9aa0a6] whitespace-nowrap">{fmtTime(hour, 0)}</span></div>
+                      <div className="w-16 shrink-0 relative"><span className={`absolute right-2.5 text-[10px] text-[#9aa0a6] whitespace-nowrap ${hour === 1 ? "top-2" : "-top-2.5"}`}>{fmtTime(hour, 0)}</span></div>
                       <div className="flex-1 border-l border-t border-[#e8eaed] relative cursor-pointer group hover:bg-[#f8f9fa] bg-white" onClick={() => openPopup(today, hour)}>
                         {evs.map(ev => {
                           const { bg, text } = evPalette(ev.color);
@@ -2236,14 +2307,14 @@ export default function App() {
                           </div>}
                           <button onClick={() => setWorkLocationMenuDay(v => v === dayNum ? null : dayNum)}
                             className="h-8 min-w-[103px] px-3 rounded-[10px] bg-[#f1f3f4] flex items-center gap-2 text-sm leading-5 font-medium text-[#5f6368] whitespace-nowrap">
-                            <span className="w-3 h-3 flex items-center justify-center text-[11px]">{workLocations[dayNum] === "오피스" ? <WorkingLocationGlyph type="office" /> : workLocations[dayNum] === "외근" ? <OffsiteCarGlyph /> : workLocations[dayNum] === "집" ? <WorkingLocationGlyph type="home" /> : "🏝️"}</span>
+                            <span className="w-3 h-3 flex items-center justify-center">{workLocations[dayNum] === "오피스" ? <WorkingLocationGlyph type="office" /> : workLocations[dayNum] === "외근" ? <OffsiteCarGlyph /> : workLocations[dayNum] === "집" ? <WorkingLocationGlyph type="home" /> : <VacationGlyph />}</span>
                             <span>{workLocations[dayNum]}</span><ChevronDown size={14} className="ml-auto" />
                           </button>
                           {workLocationMenuDay === dayNum && (
                             <div className={`absolute z-20 w-[130px] max-h-[168px] overflow-y-auto rounded-[10px] border border-[#e8eaed] bg-white py-1 shadow-xl ${applyWorkHours ? "left-[252px]" : "left-[53px]"} ${dayNum >= 4 ? "bottom-9" : "top-9"}`}>
                               {["오피스", "외근", "집"].map(location => (
                                 <button key={location} onClick={() => { setWorkLocations(v => v.map((x, n) => n === dayNum ? location : x)); setWorkLocationMenuDay(null); }} className="w-full px-3 py-2 flex items-center gap-2 text-sm text-[#5f6368] hover:bg-[#f1f3f4]">
-                                  <span className="w-3 flex justify-center">{location === "오피스" ? <WorkingLocationGlyph type="office" /> : location === "외근" ? <OffsiteCarGlyph /> : location === "집" ? <WorkingLocationGlyph type="home" /> : "🏝️"}</span>{location}
+                                  <span className="w-3 flex justify-center">{location === "오피스" ? <WorkingLocationGlyph type="office" /> : location === "외근" ? <OffsiteCarGlyph /> : location === "집" ? <WorkingLocationGlyph type="home" /> : <VacationGlyph />}</span>{location}
                                 </button>
                               ))}
                             </div>
@@ -2298,20 +2369,114 @@ export default function App() {
 
               {/* Title */}
               <div className="h-[61px] px-6">
-                <input type="text" value={popupTitle} onChange={e => setPopupTitle(e.target.value)} placeholder={activeTab === "근무장소 설정" ? "근무장소 설정" : "회의"} autoFocus
+                <input type="text" value={popupTitle} onChange={e => setPopupTitle(e.target.value)} placeholder={activeTab === "자리 비움" ? "자리 비움" : activeTab === "근무장소" ? "근무장소" : activeTab === "할 일" ? "할 일" : "회의"} autoFocus
                   className="w-full h-[45px] text-[26px] leading-none font-medium bg-transparent outline-none pb-1 text-[#202124] placeholder-[#9aa0a6]"
                   style={{ borderBottom: "2px solid #4396FB" }} />
               </div>
 
               {/* Tabs */}
               <div className="px-5 pb-4 flex gap-2">
-                {["일정","할 일","근무장소 설정"].map(tab => (
+                {["일정","할 일","근무장소","자리 비움"].map(tab => (
                   <button key={tab} onClick={() => setActiveTab(tab)}
                     className={`px-4 py-1.5 rounded-full text-[14px] leading-5 font-medium transition-colors ${activeTab === tab ? "bg-[#ECF5FF] text-[#4396FB]" : "text-[#5f6368] hover:bg-[#e8eaed]"}`}>{tab}</button>
                 ))}
               </div>
 
-              {activeTab === "근무장소 설정" ? (
+              {activeTab === "할 일" ? (
+                <>
+                  <div className="bg-white rounded-[16px] mx-4 mb-3 overflow-visible divide-y divide-[#e8eaed]">
+                    <div className="flex items-start gap-4 px-5 pt-4 pb-[18px]">
+                      <ModalGlyph name="clock" className="mt-0.5" />
+                      <div className="flex-1 min-w-0 space-y-3">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <div className="relative">
+                            <button type="button" onClick={() => { setShowDatePicker(v => !v); setShowStartPicker(false); setShowEndPicker(false); setShowRepeatPicker(false); }} className="h-9 px-4 rounded-[10px] bg-[#f1f3f4] text-[14px] font-medium text-[#5f6368] hover:bg-[#e8eaed]">{fmtDateShort(popupDate)}</button>
+                            {showDatePicker && <DatePicker value={popupDate} onChange={setPopupDate} onClose={() => setShowDatePicker(false)} />}
+                          </div>
+                          {!isAllDay && <>
+                            <div className="relative">
+                              <button type="button" onClick={() => { setShowStartPicker(v => !v); setShowDatePicker(false); setShowEndPicker(false); }} className="h-9 px-4 rounded-[10px] bg-[#f1f3f4] text-[14px] font-medium text-[#5f6368] hover:bg-[#e8eaed]">{fmtTime(startH, startM)}</button>
+                              {showStartPicker && <TimePicker value={{ h: startH, m: startM }} onChange={(h, m) => { setStartH(h); setStartM(m); if (h * 60 + m >= endH * 60 + endM) { setEndH(h + 1); setEndM(m); } }} onClose={() => setShowStartPicker(false)} />}
+                            </div>
+                            <span className="text-[14px] text-[#5f6368]">–</span>
+                            <div className="relative">
+                              <button type="button" onClick={() => { setShowEndPicker(v => !v); setShowDatePicker(false); setShowStartPicker(false); }} className="h-9 px-4 rounded-[10px] bg-[#f1f3f4] text-[14px] font-medium text-[#5f6368] hover:bg-[#e8eaed]">{fmtTime(endH, endM)}</button>
+                              {showEndPicker && <TimePicker value={{ h: endH, m: endM }} onChange={(h, m) => { setEndH(h); setEndM(m); }} onClose={() => setShowEndPicker(false)} />}
+                            </div>
+                          </>}
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <button type="button" role="checkbox" aria-checked={isAllDay} onClick={() => setIsAllDay(v => !v)} className={`w-4 h-4 rounded-[4px] border-2 flex items-center justify-center ${isAllDay ? "bg-[#4396FB] border-[#4396FB]" : "border-[#9aa0a6]"}`}>{isAllDay && <Check size={10} className="text-white" strokeWidth={3} />}</button>
+                            <span className="text-[14px] font-medium text-[#5f6368]">종일</span>
+                          </label>
+                          <button type="button" className="text-[14px] font-medium text-[#4396FB]">시간대</button>
+                        </div>
+                        <div className="relative inline-block">
+                          <button type="button" onClick={() => setShowRepeatPicker(v => !v)} className="h-9 px-4 rounded-[10px] bg-[#f1f3f4] flex items-center gap-2 text-[14px] font-medium text-[#5f6368]">{repeatVal}<ChevronDown size={14} /></button>
+                          {showRepeatPicker && <RepeatPicker value={repeatVal} onChange={setRepeatVal} onClose={() => setShowRepeatPicker(false)} />}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="h-[54px] px-5 flex items-center gap-4">
+                      <span className="w-6 text-center text-[21px] leading-none">🎯</span>
+                      <input type="text" value={taskDeadline} onChange={e => setTaskDeadline(e.target.value)} placeholder="마감일 추가" className="flex-1 bg-transparent outline-none text-[14px] leading-5 text-[#202124] placeholder-[#9aa0a6]" />
+                    </div>
+                    <div className="min-h-[54px] px-5 py-[14px] flex items-start gap-4">
+                      <ModalGlyph name="note" className="mt-0.5" />
+                      <textarea value={descriptionVal} onChange={e => setDescriptionVal(e.target.value)} rows={descriptionVal ? 3 : 1} placeholder="설명 또는 Google Drive 첨부파일 추가" className="flex-1 resize-none bg-transparent outline-none text-[14px] leading-5 text-[#202124] placeholder-[#9aa0a6]" />
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-[16px] mx-4 mb-4 px-5 py-[14px]">
+                    <div className="flex items-center gap-3"><ModalGlyph name="calendar" /><div><p className="text-[14px] leading-5 text-[#202124]">윤소연</p><p className="text-[12px] leading-4 text-[#5f6368] mt-0.5">비공개 설정</p></div></div>
+                  </div>
+                </>
+              ) : activeTab === "자리 비움" ? (
+                <>
+                  <div className="bg-white rounded-[16px] mx-4 mb-3 overflow-hidden">
+                    <div className="flex items-start gap-4 px-5 pt-4 pb-[18px] border-b border-[#e8eaed]">
+                      <ModalGlyph name="clock" className="mt-0.5" />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <button className="h-9 px-4 rounded-[10px] bg-[#f1f3f4] text-[14px] font-medium text-[#5f6368]">{fmtDateShort(popupDate)}</button>
+                          {!isAllDay && <>
+                            <button className="h-9 px-4 rounded-[10px] bg-[#f1f3f4] text-[14px] font-medium text-[#5f6368]">{fmtTime(startH, startM)}</button>
+                            <span className="text-sm text-[#5f6368]">–</span>
+                            <button className="h-9 px-4 rounded-[10px] bg-[#f1f3f4] text-[14px] font-medium text-[#5f6368]">{fmtTime(endH, endM)}</button>
+                          </>}
+                        </div>
+                        <div className="flex items-center gap-4 py-3">
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <button type="button" role="checkbox" aria-checked={isAllDay} onClick={() => setIsAllDay(v => !v)} className={`w-4 h-4 rounded-[4px] border-2 flex items-center justify-center ${isAllDay ? "bg-[#4396FB] border-[#4396FB]" : "border-[#9aa0a6]"}`}>{isAllDay && <Check size={10} className="text-white" strokeWidth={3} />}</button>
+                            <span className="text-[14px] font-medium text-[#5f6368]">종일</span>
+                          </label>
+                          <button className="text-[14px] font-medium text-[#4396FB]">시간대</button>
+                        </div>
+                        <button className="h-9 px-4 rounded-[10px] bg-[#f1f3f4] flex items-center gap-2 text-[14px] font-medium text-[#5f6368]">반복 안 함 <ChevronDown size={14} /></button>
+                        <label className="mt-4 flex items-center gap-2 cursor-pointer text-[14px] text-[#5f6368]">
+                          <button type="button" role="checkbox" aria-checked={awayAutoCancel} onClick={() => setAwayAutoCancel(v => !v)} className={`w-4 h-4 rounded-[4px] border-2 flex items-center justify-center ${awayAutoCancel ? "bg-[#4396FB] border-[#4396FB]" : "border-[#9aa0a6]"}`}>{awayAutoCancel && <Check size={10} className="text-white" strokeWidth={3} />}</button>
+                          자동으로 회의 취소하기
+                        </label>
+                        {awayAutoCancel && <div className="mt-3 ml-6 space-y-2">
+                          {([['existing','기존 회의 취소하기'],['all','기존 및 새로운 회의 취소하기']] as const).map(([value, label]) => (
+                            <button key={value} type="button" onClick={() => setAwayCancelScope(value)} className="flex items-center gap-2 text-[14px] text-[#5f6368]">
+                              <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${awayCancelScope === value ? "border-[#4396FB]" : "border-[#9aa0a6]"}`}>{awayCancelScope === value && <span className="w-2 h-2 rounded-full bg-[#4396FB]" />}</span>
+                              {label}
+                            </button>
+                          ))}
+                        </div>}
+                      </div>
+                    </div>
+                    <div className="h-[54px] px-5 py-[14px] flex items-center gap-4 text-[14px] text-[#5f6368]">
+                      <ModalGlyph name="note" />
+                      <span>부재 중이어서 자동으로 거절되었습니다</span>
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-[16px] mx-4 mb-4 px-5 py-[14px]">
+                    <div className="flex items-center gap-3"><ModalGlyph name="calendar" /><div><p className="text-[14px] leading-5 text-[#202124]">윤소연</p><p className="text-[12px] leading-4 text-[#5f6368] mt-0.5">기본 공개 설정</p></div></div>
+                  </div>
+                </>
+              ) : activeTab === "근무장소" ? (
                 <>
                   <div className="bg-white rounded-[16px] mx-4 mb-3 px-5 py-6">
                     <div className="flex items-start gap-4">
@@ -2344,13 +2509,13 @@ export default function App() {
                         <p className="text-[14px] leading-7 font-medium text-[#3c4043]">근무장소 선택</p>
                         <div className="mt-2 flex flex-wrap gap-2">
                           {([
-                            ["office", "오피스"], ["other", "외근"], ["home", "집"], ["vacation", "휴가"],
+                            ["office", "오피스"], ["other", "외근"], ["home", "집"],
                           ] as const).map(([value, label]) => {
                             const selected = workingLocation === value;
                             return (
                               <button key={value} type="button" onClick={() => setWorkingLocation(value)}
                                 className={`h-8 px-3 rounded-[10px] flex items-center gap-1 text-[12px] leading-4 font-semibold transition-colors ${selected ? "bg-[#ECF5FF] text-[#4396FB]" : "bg-[#f1f3f4] text-[#5f6368]"}`}>
-                                {value === "office" ? <WorkingLocationGlyph type="office" className="w-3 h-3" /> : value === "home" ? <WorkingLocationGlyph type="home" className="w-3 h-3" /> : value === "other" ? <OffsiteCarGlyph /> : <span className="text-[11px]">🏝️</span>}
+                                {value === "office" ? <WorkingLocationGlyph type="office" className="w-3 h-3" /> : value === "home" ? <WorkingLocationGlyph type="home" className="w-3 h-3" /> : value === "other" ? <OffsiteCarGlyph /> : <VacationGlyph />}
                                 <span>{label}</span>
                               </button>
                             );
@@ -2713,7 +2878,37 @@ export default function App() {
                 <div className="flex items-start gap-4 px-5 pt-[14px] pb-[15px]">
                   <ModalGlyph name="people" className="mt-2" />
                   <div className="flex-1">
-                    <div className="h-9 w-full px-3 py-2 rounded-[10px] bg-[#f1f3f4] text-[14px] leading-5 text-[#9aa0a6] cursor-text mb-3">참석자 추가</div>
+                    <div className="relative mb-3">
+                      <input
+                        type="text"
+                        value={attendeeQuery}
+                        onChange={e => { setAttendeeQuery(e.target.value); setAttendeeSearchOpen(true); }}
+                        onFocus={() => setAttendeeSearchOpen(true)}
+                        onBlur={() => window.setTimeout(() => setAttendeeSearchOpen(false), 120)}
+                        placeholder="참석자 추가"
+                        className="h-9 w-full px-3 py-2 rounded-[10px] bg-[#f1f3f4] text-[14px] leading-5 text-[#202124] placeholder-[#9aa0a6] outline-none border border-transparent focus:border-[#4396FB]" />
+                      {attendeeSearchOpen && (
+                        <div className="absolute top-10 left-0 right-0 z-40 rounded-[12px] border border-[#e8eaed] bg-white p-1 shadow-[0_8px_24px_rgba(60,64,67,0.18)]">
+                          {allPeople
+                            .filter(person => !addedAttendeeIds.includes(person.id))
+                            .filter(person => {
+                              const query = attendeeQuery.trim().toLowerCase();
+                              return !query || person.name.toLowerCase().includes(query) || person.role.toLowerCase().includes(query);
+                            })
+                            .slice(0, 5)
+                            .map(person => (
+                              <button key={person.id} type="button"
+                                onMouseDown={e => e.preventDefault()}
+                                onClick={() => { setAddedAttendeeIds(ids => [...ids, person.id]); setAttendeeQuery(""); }}
+                                className="w-full h-11 px-2 flex items-center gap-3 rounded-[10px] text-left hover:bg-[#f1f3f4] transition-colors">
+                                <ProfileAvatar person={person} size={32} />
+                                <span className="flex-1 text-[14px] font-medium text-[#202124]">{person.name}</span>
+                                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-[#f1f3f4] text-[#5f6368]">{person.role}</span>
+                              </button>
+                            ))}
+                        </div>
+                      )}
+                    </div>
                     <PersonRow person={ORGANIZER} role="주최자" />
                     {projectId && requiredPeople.length > 0 && (
                       <>
@@ -2727,11 +2922,14 @@ export default function App() {
                         {optionalPeople.map(p => <PersonRow key={p.id} person={p} role={p.role} />)}
                       </>
                     )}
+                    {allPeople.filter(person => addedAttendeeIds.includes(person.id) && !requiredPeople.some(p => p.id === person.id) && !optionalPeople.some(p => p.id === person.id)).map(person => (
+                      <PersonRow key={`added-${person.id}`} person={person} role={person.role} />
+                    ))}
                   </div>
                 </div>
 
                 {/* Schedule Preview — shown when project is selected */}
-                {projectId && (
+                {(projectId || addedAttendeeIds.length > 0) && (
                   <div className="flex items-start gap-4 px-5 py-[14px]">
                     <ModalGlyph name="calendar" className="mt-0.5" />
                     <div className="min-w-0 flex-1">
@@ -2762,7 +2960,7 @@ export default function App() {
                                 <p className="mb-2 text-[10px] leading-[15px] text-[#9aa0a6]">현재 주 범위 외</p>
                               )}
                               <SchedulePreview
-                                participants={[ORGANIZER, ...requiredPeople, ...optionalPeople].filter(p => isPersonVisible(p.id))}
+                                participants={[ORGANIZER, ...requiredPeople, ...optionalPeople, ...allPeople.filter(person => addedAttendeeIds.includes(person.id) && !requiredPeople.some(p => p.id === person.id) && !optionalPeople.some(p => p.id === person.id))].filter(p => isPersonVisible(p.id))}
                                 dayOffset={getDayOffset(popupDate)}
                                 sampleEvents={sampleEventsForWeek}
                                 selStartH={startH} selStartM={startM}
@@ -2772,7 +2970,7 @@ export default function App() {
                               {(() => {
                                 const do_ = getDayOffset(popupDate);
                                 if (do_ < 0) return null;
-                                const allP = [ORGANIZER, ...requiredPeople, ...optionalPeople].filter(p => isPersonVisible(p.id));
+                                const allP = [ORGANIZER, ...requiredPeople, ...optionalPeople, ...allPeople.filter(person => addedAttendeeIds.includes(person.id) && !requiredPeople.some(p => p.id === person.id) && !optionalPeople.some(p => p.id === person.id))].filter(p => isPersonVisible(p.id));
                                 const conflicts = allP.filter(p => {
                                   const evs = sampleEventsForWeek.filter(e => e.dayOffset === do_ && COLOR_TO_PID[e.color] === p.id && isEventVisible(e));
                                   return evs.some(ev => {
@@ -2943,9 +3141,9 @@ export default function App() {
               {/* Footer */}
               <div className="h-[76px] flex items-center justify-end px-5 pt-4 pb-5">
                 <button
-                  onClick={activeTab === "근무장소 설정" ? handleSaveWorkingLocation : handleSave}
-                  disabled={activeTab === "근무장소 설정" && !workingLocation}
-                  className={`px-6 py-2.5 rounded-full text-white text-[14px] leading-5 font-semibold transition-colors shadow-[0px_1px_1.5px_rgba(0,0,0,0.1),0px_1px_1px_rgba(0,0,0,0.1)] ${activeTab === "근무장소 설정" && !workingLocation ? "bg-[#B9D9FF] cursor-not-allowed" : "bg-[#4396FB] hover:bg-[#2F7FE6]"}`}>
+                  onClick={activeTab === "자리 비움" ? handleSaveAway : activeTab === "근무장소" ? handleSaveWorkingLocation : activeTab === "할 일" ? handleSaveTask : handleSave}
+                  disabled={activeTab === "근무장소" && !workingLocation}
+                  className={`px-6 py-2.5 rounded-full text-white text-[14px] leading-5 font-semibold transition-colors shadow-[0px_1px_1.5px_rgba(0,0,0,0.1),0px_1px_1px_rgba(0,0,0,0.1)] ${activeTab === "근무장소" && !workingLocation ? "bg-[#B9D9FF] cursor-not-allowed" : "bg-[#4396FB] hover:bg-[#2F7FE6]"}`}>
                   저장
                 </button>
               </div>
