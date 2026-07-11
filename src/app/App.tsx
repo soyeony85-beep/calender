@@ -171,22 +171,15 @@ function PreferenceGlyph({ className = "shrink-0" }: { className?: string }) {
   );
 }
 
-function MeetingAvoidGlyph({ type }: { type: "lunch" | "home" }) {
-  if (type === "lunch") {
-    return (
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="shrink-0" aria-hidden="true">
-        <path d="M14.7105 8.81401C14.8671 8.25182 15.2817 7.79762 15.7959 7.52162L16.2339 7.30022L22.7589 3.88442C23.1183 3.69182 23.2479 3.24122 23.0469 2.88662L22.7757 2.41682C22.5693 2.06522 22.1139 1.95242 21.7671 2.16722L15.5463 6.11042L15.1353 6.37922C14.6397 6.68642 14.0385 6.81841 13.4733 6.67321C12.5217 6.42841 11.1039 6.38642 9.92551 7.07882C8.06851 8.17022 7.61551 9.86101 8.32651 11.0718C9.01891 12.2928 10.7097 12.7458 12.5841 11.6832C13.7727 11.0094 14.4453 9.76021 14.7093 8.81401H14.7105Z" fill="#8A94A0" />
-        <path d="M9.17578 18.9293H14.8224V20.9351C14.8224 21.4901 14.3718 21.9407 13.8168 21.9407H10.182C9.62698 21.9407 9.17638 21.4901 9.17638 20.9351L9.17578 18.9293Z" fill="#AFB7C0" />
-        <path fillRule="evenodd" clipRule="evenodd" d="M22.055 9.33057C22.6394 9.33057 23.108 9.83277 23.0516 10.4148C22.5068 16.0392 17.7662 20.4354 11.999 20.4354C6.23179 20.4354 1.49179 16.0392 0.946993 10.4148C0.890593 9.83337 1.35919 9.33057 1.94359 9.33057H22.055Z" fill="#D0D5DA" />
-      </svg>
-    );
-  }
-
+function MeetingAvoidGlyph({ type: _type }: { type: "lunch" | "home" }) {
   return (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="shrink-0" aria-hidden="true">
-      <path d="M10.6862 17.406H13.3136C13.9004 17.406 14.3762 17.8824 14.3762 18.4686V22.1586H9.62305V18.4686C9.62305 17.8818 10.0994 17.406 10.6856 17.406H10.6862Z" fill="#6B7683" />
-      <path d="M21.0693 8.77566L12.6219 2.05866C12.2577 1.76886 11.7417 1.76886 11.3769 2.05866L2.93069 8.77566C2.45369 9.15486 2.17529 9.73146 2.17529 10.3411V19.7593C2.17529 21.0847 3.24989 22.1593 4.57529 22.1593H9.99989V18.4063C9.99989 17.8543 10.4475 17.4061 11.0001 17.4061H12.9999C13.5519 17.4061 14.0001 17.8537 14.0001 18.4063V22.1593H19.4241C20.7495 22.1593 21.8241 21.0847 21.8241 19.7593V10.3411C21.8241 9.73146 21.5469 9.15486 21.0693 8.77566Z" fill="#D0D5DA" />
-      <path d="M21.0688 8.77506L12.622 2.05866C12.2578 1.76886 11.7418 1.76886 11.3776 2.05866L2.9302 8.77566C2.4532 9.15486 2.1748 9.73146 2.1748 10.3411V13.3765L11.377 6.05886C11.7412 5.76906 12.2572 5.76906 12.622 6.05886L21.8236 13.3765V10.3411C21.8236 9.73146 21.5452 9.15486 21.0682 8.77506H21.0688Z" fill="#007FF2" />
+      <path d="M19.8545 2.87939H4.1453C3.18134 2.87939 2.3999 3.66084 2.3999 4.62479V19.752C2.3999 20.716 3.18134 21.4974 4.1453 21.4974H19.8545C20.8185 21.4974 21.5999 20.716 21.5999 19.752V4.62479C21.5999 3.66084 20.8185 2.87939 19.8545 2.87939Z" fill="#E5E9EE" />
+      <path d="M4.1453 2.87939H19.8545C20.8181 2.87939 21.5999 3.66179 21.5999 4.62479V7.43639H2.3999V4.62479C2.3999 3.66119 3.1823 2.87939 4.1453 2.87939Z" fill="#FDAEB3" />
+      <path d="M6.18179 4.33385C5.78039 4.33385 5.45459 4.00865 5.45459 3.60665V2.15225C5.45459 1.75025 5.77979 1.42505 6.18179 1.42505C6.58379 1.42505 6.90899 1.75025 6.90899 2.15225V3.60665C6.90899 4.00865 6.58379 4.33385 6.18179 4.33385Z" fill="#4B596A" />
+      <path d="M17.818 4.33385C17.4166 4.33385 17.0908 4.00865 17.0908 3.60665V2.15225C17.0908 1.75025 17.416 1.42505 17.818 1.42505C18.22 1.42505 18.5452 1.75025 18.5452 2.15225V3.60665C18.5452 4.00865 18.22 4.33385 17.818 4.33385Z" fill="#4B596A" />
+      <path d="M15.2119 18.0001C14.9589 18.0001 14.7064 17.9037 14.5132 17.7105L8.08949 11.2868C7.70357 10.9009 7.70357 10.2753 8.08949 9.88941C8.4754 9.5035 9.10097 9.5035 9.48689 9.88941L15.9106 16.3131C16.2965 16.699 16.2965 17.3246 15.9106 17.7105C15.7174 17.9037 15.4649 18.0001 15.2119 18.0001Z" fill="#EF4452" />
+      <path d="M8.78819 18.0001C8.53519 18.0001 8.28269 17.9037 8.08949 17.7105C7.70357 17.3246 7.70357 16.699 8.08949 16.3131L14.5132 9.88941C14.8991 9.5035 15.5247 9.5035 15.9106 9.88941C16.2965 10.2753 16.2965 10.9009 15.9106 11.2868L9.48689 17.7105C9.29369 17.9037 9.04119 18.0001 8.78819 18.0001Z" fill="#EF4452" />
     </svg>
   );
 }
@@ -194,10 +187,9 @@ function MeetingAvoidGlyph({ type }: { type: "lunch" | "home" }) {
 function RoomResourceGlyph({ className = "w-6 h-6 shrink-0" }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-      <path d="M5.25 3.25h9.5v17.5h-9.5V3.25Z" stroke="#4E5968" strokeWidth="1.8" />
-      <path d="M14.75 8.25h4v12.5h-4" stroke="#4E5968" strokeWidth="1.8" />
-      <path d="M8.1 8.1h3.2M8.1 11.9h3.2M8.1 15.7h3.2" stroke="#4E5968" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M3.75 20.75h16.5" stroke="#4E5968" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M19.54 2.30945H4.4596C3.8188 2.30945 3.2998 2.82905 3.2998 3.46925V20.439C3.2998 21.1302 3.8602 21.6901 4.5508 21.6901H19.4482C20.1394 21.6901 20.6992 21.1296 20.6992 20.439V3.46925C20.6992 2.82845 20.1802 2.30945 19.54 2.30945Z" fill="#D0D5DA" />
+      <path d="M11.135 18.5623H12.8642C13.25 18.5623 13.5638 18.8755 13.5638 19.2619V21.6907H10.436V19.2619C10.436 18.8761 10.7486 18.5623 11.135 18.5623Z" fill="#6B7683" />
+      <path d="M8.80971 14.6328C8.80971 14.793 8.68011 14.9226 8.51991 14.9226H7.36011C7.19991 14.9226 7.07031 14.793 7.07031 14.6328V13.473C7.07031 13.3128 7.19991 13.1832 7.36011 13.1832H8.51991C8.68011 13.1832 8.80971 13.3128 8.80971 13.473V14.6328ZM8.80971 10.5726C8.80971 10.7328 8.68011 10.8624 8.51991 10.8624H7.36011C7.19991 10.8624 7.07031 10.7328 7.07031 10.5726V9.41285C7.07031 9.25265 7.19991 9.12305 7.36011 9.12305H8.51991C8.68011 9.12305 8.80971 9.25265 8.80971 9.41285V10.5726ZM8.80971 6.51245C8.80971 6.67265 8.68011 6.80225 8.51991 6.80225H7.36011C7.19991 6.80225 7.07031 6.67265 7.07031 6.51245V5.35265C7.07031 5.19245 7.19991 5.06285 7.36011 5.06285H8.51991C8.68011 5.06285 8.80971 5.19245 8.80971 5.35265V6.51245ZM12.8699 14.6322C12.8699 14.7924 12.7403 14.922 12.5801 14.922H11.4203C11.2601 14.922 11.1305 14.7924 11.1305 14.6322V13.4724C11.1305 13.3122 11.2601 13.1826 11.4203 13.1826H12.5801C12.7403 13.1826 12.8699 13.3122 12.8699 13.4724V14.6322ZM12.8699 10.572C12.8699 10.7322 12.7403 10.8618 12.5801 10.8618H11.4203C11.2601 10.8618 11.1305 10.7322 11.1305 10.572V9.41225C11.1305 9.25205 11.2601 9.12245 11.4203 9.12245H12.5801C12.7403 9.12245 12.8699 9.25205 12.8699 9.41225V10.572ZM12.8699 6.51185C12.8699 6.67205 12.7403 6.80165 12.5801 6.80165H11.4203C11.2601 6.80165 11.1305 6.67205 11.1305 6.51185V5.35205C11.1305 5.19185 11.2601 5.06225 11.4203 5.06225H12.5801C12.7403 5.06225 12.8699 5.19185 12.8699 5.35205V6.51185ZM16.9301 14.6316C16.9301 14.7918 16.8005 14.9214 16.6403 14.9214H15.4805C15.3203 14.9214 15.1907 14.7918 15.1907 14.6316V13.4718C15.1907 13.3116 15.3203 13.182 15.4805 13.182H16.6403C16.8005 13.182 16.9301 13.3116 16.9301 13.4718V14.6316ZM16.9301 10.5714C16.9301 10.7316 16.8005 10.8612 16.6403 10.8612H15.4805C15.3203 10.8612 15.1907 10.7316 15.1907 10.5714V9.41165C15.1907 9.25145 15.3203 9.12185 15.4805 9.12185H16.6403C16.8005 9.12185 16.9301 9.25145 16.9301 9.41165V10.5714ZM16.9301 6.51125C16.9301 6.67145 16.8005 6.80105 16.6403 6.80105H15.4805C15.3203 6.80105 15.1907 6.67145 15.1907 6.51125V5.35145C15.1907 5.19125 15.3203 5.06165 15.4805 5.06165H16.6403C16.8005 5.06165 16.9301 5.19125 16.9301 5.35145V6.51125Z" fill="#8A94A0" />
     </svg>
   );
 }
@@ -219,15 +211,20 @@ function WorkingLocationGlyph({ type, className = "w-5 h-5 shrink-0" }: { type: 
   );
 }
 
-function OutOfOfficeChip({ person }: { person: { name: string; avatarColor: string } }) {
+function OutOfOfficeChip({ people }: { people: { name: string; avatarColor: string }[] }) {
+  if (people.length === 0) return null;
   return (
     <div
-      className="h-[19.5px] w-full flex items-center gap-[5px] overflow-hidden px-[6px] py-[3px] rounded-[4px] text-[9px] leading-[13.5px] font-semibold mb-0.5"
-      style={{ backgroundColor: person.avatarColor + "21", color: person.avatarColor }}>
-      <span
-        className="w-3.5 h-3.5 rounded-full flex items-center justify-center shrink-0"
-        style={{ backgroundColor: person.avatarColor + "18" }}>
-        <SuitcaseGlyph />
+      className="min-h-6 w-full flex items-center gap-1.5 overflow-visible px-0 text-[10px] leading-[15px] font-semibold text-[#4E5968]">
+      <span className="flex flex-wrap items-center gap-1 shrink-0">
+        {people.slice(0, 3).map(person => (
+          <span
+            key={person.name}
+            className="w-6 h-6 rounded-[7px] flex items-center justify-center shrink-0"
+            style={{ backgroundColor: `${person.avatarColor}24` }}>
+            <SuitcaseGlyph />
+          </span>
+        ))}
       </span>
       <span className="truncate">외근</span>
     </div>
@@ -236,6 +233,13 @@ function OutOfOfficeChip({ person }: { person: { name: string; avatarColor: stri
 
 const DAYS_KR = ["일","월","화","수","목","금","토"];
 const REPEAT_OPTIONS = ["반복 안 함","매일","매주","격주","매월","매년"];
+const TIMEZONE_OPTIONS = [
+  { label: "대한민국 표준시", city: "서울", value: "GMT+09:00" },
+  { label: "일본 표준시", city: "도쿄", value: "GMT+09:00" },
+  { label: "태평양 표준시", city: "샌프란시스코", value: "GMT-07:00" },
+  { label: "동부 표준시", city: "뉴욕", value: "GMT-04:00" },
+  { label: "그리니치 표준시", city: "런던", value: "GMT+01:00" },
+];
 
 /* ── Helpers ── */
 function fmtTime(h: number, m: number) {
@@ -652,6 +656,7 @@ export default function App() {
   /* ── Calendar state ── */
   const [currentView, setCurrentView] = useState<ViewMode>("주");
   const [weekStart, setWeekStart] = useState(initialWeekStart);
+  const [selectedDate, setSelectedDate] = useState(today);
   const [viewMenuOpen, setViewMenuOpen] = useState(false);
   const [savedEvents, setSavedEvents] = useState<SavedEvent[]>([]);
   const [eventOverrides, setEventOverrides] = useState<Record<string, EventOverride>>({});
@@ -690,9 +695,13 @@ export default function App() {
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
   const [showRepeatPicker, setShowRepeatPicker] = useState(false);
+  const [showTimezonePicker, setShowTimezonePicker] = useState(false);
+  const [timezoneVal, setTimezoneVal] = useState(TIMEZONE_OPTIONS[0]);
   const [locationMode, setLocationMode] = useState<"none" | "room" | "location">("none");
   const [roomVal, setRoomVal] = useState("");
   const [roomSearch, setRoomSearch] = useState("");
+  const [roomListExpanded, setRoomListExpanded] = useState(true);
+  const [schedulePreviewExpanded, setSchedulePreviewExpanded] = useState(true);
   const [locationVal, setLocationVal] = useState("");
   const [descriptionVal, setDescriptionVal] = useState("");
   const [workingLocation, setWorkingLocation] = useState<"home" | "office" | "other">("office");
@@ -716,9 +725,9 @@ export default function App() {
 
   const PROJECT_COLORS = ["#4396FB","#3182F6","#00C3B2","#8B5CF6","#ea4335","#fbbc04","#34a853","#FF6B6B"];
   const ROOM_OPTIONS = [
-    { id: "rd-center", name: "R&D Center", building: "HQ", floor: "B1F", capacity: 6 },
-    { id: "moon-cake", name: "Moon Cake", building: "HQ", floor: "B1F", capacity: 6 },
-    { id: "sprint-room", name: "Sprint Room", building: "HQ", floor: "5F", capacity: 8 },
+    { id: "ut-room", name: "UT룸", building: "HQ", floor: "3F", capacity: 6 },
+    { id: "research-room", name: "리서치룸", building: "HQ", floor: "4F", capacity: 6 },
+    { id: "sprint-room", name: "스프린트룸", building: "HQ", floor: "5F", capacity: 8 },
   ];
 
   function parsePersonInput(raw: string, fallbackIndex: number) {
@@ -861,10 +870,16 @@ export default function App() {
       setMiniCalMonth(new Date(next.getFullYear(), next.getMonth(), 1));
       return next;
     });
+    setSelectedDate(prev => {
+      const next = new Date(prev);
+      next.setDate(prev.getDate() + delta * 7);
+      return next;
+    });
   }
   function goToday() {
     setWeekStart(initialWeekStart);
     setMiniCalMonth(new Date(today.getFullYear(), today.getMonth(), 1));
+    setSelectedDate(today);
   }
   const weekOffset = Math.round((weekStart.getTime() - initialWeekStart.getTime()) / (7 * 86400000));
   const sampleEventsForWeek = useMemo<SampleEvent[]>(() => {
@@ -925,9 +940,10 @@ export default function App() {
     setPopupDate(date); setStartH(hour); setStartM(0); setEndH(hour + 1); setEndM(0);
     setPopupTitle(""); setProjectId(null); setMeetingTypeId(null); setRoomVal(""); setRoomSearch(""); setLocationVal(""); setDescriptionVal("");
     setWorkingLocation("office");
+    setRoomListExpanded(true);
     setLocationMode("none");
     setIsAllDay(false); setRepeatVal("반복 안 함"); setActiveTab("일정");
-    setShowDatePicker(false); setShowStartPicker(false); setShowEndPicker(false); setShowRepeatPicker(false);
+    setShowDatePicker(false); setShowStartPicker(false); setShowEndPicker(false); setShowRepeatPicker(false); setShowTimezonePicker(false);
     setAddProjectOpen(false); setAddProjectInput(""); setNewProjectMembers([]); setMemberSearch("");
     setAddTypeOpen(false); setAddTypeInput(""); setNewTypeRequiredRoles([]); setNewTypeOptionalRoles([]);
     setPopupOpen(true);
@@ -991,7 +1007,21 @@ export default function App() {
     return () => document.removeEventListener("mousedown", handler);
   }, [showMyMenu]);
 
-  function isToday(d: Date) { return d.getDate() === today.getDate() && d.getMonth() === today.getMonth(); }
+  function sameDate(a: Date, b: Date) {
+    return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  }
+  function isToday(d: Date) { return sameDate(d, today); }
+  function startOfWeek(d: Date) {
+    const next = new Date(d);
+    next.setHours(0, 0, 0, 0);
+    next.setDate(next.getDate() - next.getDay());
+    return next;
+  }
+  function selectMiniDate(date: Date) {
+    setSelectedDate(date);
+    setWeekStart(startOfWeek(date));
+    setMiniCalMonth(new Date(date.getFullYear(), date.getMonth(), 1));
+  }
   function isPersonVisible(id: number) { return visiblePersonIds.includes(id); }
   function togglePersonVisibility(id: number) {
     setVisiblePersonIds(prev => prev.includes(id) ? prev.filter(personId => personId !== id) : [...prev, id]);
@@ -1332,9 +1362,15 @@ export default function App() {
             <div className="grid grid-cols-7 gap-y-0.5">
               {miniDays.map((day, i) => {
                 if (!day) return <div key={i} />;
-                const isT = day === today.getDate() && miniCalMonth.getMonth() === today.getMonth();
-                return <button key={i} onClick={() => openPopup(new Date(2026,6,day), 10)}
-                  className={`w-7 h-7 mx-auto rounded-full text-[11px] font-medium flex items-center justify-center transition-colors ${isT ? "bg-[#4396FB] text-white" : "text-[#202124] hover:bg-[#f1f3f4]"}`}>{day}</button>;
+                const date = new Date(miniCalMonth.getFullYear(), miniCalMonth.getMonth(), day);
+                const isT = sameDate(date, today);
+                const isSelected = sameDate(date, selectedDate);
+                return <button key={i} onClick={() => selectMiniDate(date)}
+                  className={`w-7 h-7 mx-auto rounded-full text-[11px] font-medium flex items-center justify-center transition-colors ${
+                    isT ? "bg-[#4396FB] text-white"
+                      : isSelected ? "bg-[#ECF5FF] text-[#4396FB]"
+                        : "text-[#202124] hover:bg-[#f1f3f4]"
+                  }`}>{day}</button>;
               })}
             </div>
           </div>
@@ -1388,7 +1424,7 @@ export default function App() {
                       onClick={() => { setMyPrefsTab("ooo"); setShowMyPrefs(true); setShowMyMenu(false); }}
                       className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-[#202124] hover:bg-[#f1f3f4] transition-colors text-left">
                       <SuitcaseGlyph />
-                      외근 설정
+                      근무장소 설정
                     </button>
                     <button
                       onClick={() => { setMyPrefsTab("meeting"); setShowMyPrefs(true); setShowMyMenu(false); }}
@@ -1504,30 +1540,26 @@ export default function App() {
                   return (
                     <div key={idx} className="flex-1 h-[77px] flex flex-col items-center pt-2 pb-2 border-l border-[#e8eaed]">
                       <span className={`text-[11px] leading-[16.5px] font-semibold tracking-[1.1px] uppercase ${tod ? "text-[#4396FB]" : isWknd ? "text-[#bdc1c6]" : "text-[#5f6368]"}`}>{DAYS_KR[day.getDay()]}</span>
-                      <div className={`w-10 h-10 flex items-center justify-center mt-1 transition-colors ${tod ? "rounded-lg bg-[#ECF5FF]" : "rounded-full hover:bg-[#f1f3f4]"}`}>
-                        <span className={`text-2xl leading-8 font-normal ${tod ? "text-[#4396FB]" : isWknd ? "text-[#bdc1c6]" : "text-[#202124]"}`}>{day.getDate()}</span>
+                      <div className={`w-10 h-10 flex items-center justify-center mt-1 transition-colors ${tod ? "rounded-lg bg-[#4396FB]" : "rounded-full hover:bg-[#f1f3f4]"}`}>
+                        <span className={`text-2xl leading-8 font-normal ${tod ? "text-white" : isWknd ? "text-[#bdc1c6]" : "text-[#202124]"}`}>{day.getDate()}</span>
                       </div>
                     </div>
                   );
                 })}
               </div>
-              <div className="h-[55px] flex border-b border-[#e8eaed] bg-white shrink-0">
-                <div className="w-16 h-[55px] shrink-0 flex items-center justify-end pr-2"><span className="text-[9px] leading-[13.5px] text-[#c5c7c5] font-medium">종일</span></div>
+              <div className="min-h-[55px] flex items-stretch border-b border-[#e8eaed] bg-white shrink-0">
+                <div className="w-16 min-h-[55px] shrink-0 flex items-center justify-end pr-2"><span className="text-[9px] leading-[13.5px] text-[#c5c7c5] font-medium">종일</span></div>
                 {weekDays.map((day, idx) => {
                   // dayOfWeek: 0=Sun,1=Mon,...,6=Sat → map to 1-based Mon-Fri
                   const dw = day.getDay(); // 1=Mon…5=Fri
                   const myOOOToday = myPrefs.oooDays.includes(dw) && isPersonVisible(ORGANIZER.id);
+                  const oooPeople = [
+                    ...(dw === 4 ? OOO_THURSDAY.map(p => personById(p.id)).filter(p => isPersonVisible(p.id)) : []),
+                    ...(myOOOToday ? [ORGANIZER] : []),
+                  ];
                   return (
-                    <div key={idx} className="flex-1 h-[55px] border-l border-[#e8eaed] pl-[5px] pr-1 py-1.5 overflow-hidden">
-                      {/* Fixed OOO: 박은주·정지훈 on Thu */}
-                      {dw === 4 && OOO_THURSDAY
-                        .map(p => personById(p.id))
-                        .filter(p => isPersonVisible(p.id))
-                        .map(p => <OutOfOfficeChip key={p.id} person={p} />)}
-                      {/* My OOO from settings */}
-                      {myOOOToday && (
-                        <OutOfOfficeChip person={ORGANIZER} />
-                      )}
+                    <div key={idx} className="flex-1 min-h-[55px] border-l border-[#e8eaed] pl-[5px] pr-1 py-1.5 overflow-visible">
+                      <OutOfOfficeChip people={oooPeople} />
                     </div>
                   );
                 })}
@@ -1904,7 +1936,7 @@ export default function App() {
 
               {/* Tabs */}
               <div className="flex gap-2 px-5 pt-4 pb-2">
-                {[{ id: "ooo" as const, label: "외근 설정", icon: <SuitcaseGlyph /> },
+                {[{ id: "ooo" as const, label: "근무장소 설정", icon: <SuitcaseGlyph /> },
                   { id: "meeting" as const, label: "개인 선호", icon: <PreferenceGlyph /> }].map(tab => (
                   <button key={tab.id} onClick={() => setMyPrefsTab(tab.id)}
                     className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm font-medium transition-colors
@@ -2115,7 +2147,7 @@ export default function App() {
                     <div className="flex items-center gap-2 flex-wrap">
                       {/* Date pill */}
                       <div className="relative">
-                        <button onClick={() => { setShowDatePicker(v => !v); setShowStartPicker(false); setShowEndPicker(false); setShowRepeatPicker(false); }}
+                        <button onClick={() => { setShowDatePicker(v => !v); setShowStartPicker(false); setShowEndPicker(false); setShowRepeatPicker(false); setShowTimezonePicker(false); }}
                           className="h-9 px-4 rounded-[10px] bg-[#f1f3f4] text-[14px] leading-5 font-medium text-[#5f6368] hover:bg-[#e8eaed] transition-colors">
                           {fmtDateShort(popupDate)}
                         </button>
@@ -2125,7 +2157,7 @@ export default function App() {
                       {!isAllDay && (
                         <>
                           <div className="relative">
-                            <button onClick={() => { setShowStartPicker(v => !v); setShowDatePicker(false); setShowEndPicker(false); setShowRepeatPicker(false); }}
+                            <button onClick={() => { setShowStartPicker(v => !v); setShowDatePicker(false); setShowEndPicker(false); setShowRepeatPicker(false); setShowTimezonePicker(false); }}
                               className="h-9 px-4 rounded-[10px] bg-[#f1f3f4] text-[14px] leading-5 font-medium text-[#5f6368] hover:bg-[#e8eaed] transition-colors">
                               {fmtTime(startH, startM)}
                             </button>
@@ -2133,7 +2165,7 @@ export default function App() {
                           </div>
                           <span className="text-[#5f6368] text-sm">–</span>
                           <div className="relative">
-                            <button onClick={() => { setShowEndPicker(v => !v); setShowDatePicker(false); setShowStartPicker(false); setShowRepeatPicker(false); }}
+                            <button onClick={() => { setShowEndPicker(v => !v); setShowDatePicker(false); setShowStartPicker(false); setShowRepeatPicker(false); setShowTimezonePicker(false); }}
                               className="h-9 px-4 rounded-[10px] bg-[#f1f3f4] text-[14px] leading-5 font-medium text-[#5f6368] hover:bg-[#e8eaed] transition-colors">
                               {fmtTime(endH, endM)}
                             </button>
@@ -2151,11 +2183,51 @@ export default function App() {
                         </div>
                         <span className="text-[14px] leading-5 font-medium text-[#5f6368]">종일</span>
                       </label>
-                      <button className="text-sm text-[#4396FB] font-medium hover:underline">시간대</button>
+                      <div className="relative">
+                        <button
+                          type="button"
+                          onClick={() => { setShowTimezonePicker(v => !v); setShowDatePicker(false); setShowStartPicker(false); setShowEndPicker(false); setShowRepeatPicker(false); }}
+                          className="text-sm text-[#4396FB] font-medium hover:underline">
+                          시간대
+                        </button>
+                        <AnimatePresence>
+                          {showTimezonePicker && (
+                            <motion.div
+                              initial={{ opacity: 0, y: -4, scale: 0.98 }}
+                              animate={{ opacity: 1, y: 0, scale: 1 }}
+                              exit={{ opacity: 0, y: -4, scale: 0.98 }}
+                              transition={{ duration: 0.12 }}
+                              className="absolute left-0 top-full mt-2 z-[70] w-[280px] rounded-2xl border border-[#e8eaed] bg-white p-3 shadow-xl">
+                              <div className="px-2 pb-2">
+                                <p className="text-[13px] leading-5 font-semibold text-[#202124]">기본 시간대</p>
+                                <p className="text-[11px] leading-4 text-[#8A94A0]">회의 시간이 표시될 세계 시간대를 선택해요</p>
+                              </div>
+                              <div className="max-h-56 overflow-y-auto pr-1" style={{ scrollbarWidth: "thin" }}>
+                                {TIMEZONE_OPTIONS.map(zone => {
+                                  const selected = timezoneVal.label === zone.label && timezoneVal.city === zone.city;
+                                  return (
+                                    <button
+                                      key={`${zone.label}-${zone.city}`}
+                                      type="button"
+                                      onClick={() => { setTimezoneVal(zone); setShowTimezonePicker(false); }}
+                                      className={`w-full flex items-center justify-between gap-3 rounded-xl px-2.5 py-2 text-left transition-colors ${selected ? "bg-[#ECF5FF]" : "hover:bg-[#f1f3f4]"}`}>
+                                      <span className="min-w-0">
+                                        <span className={`block truncate text-[13px] leading-5 font-semibold ${selected ? "text-[#4396FB]" : "text-[#202124]"}`}>{zone.city}</span>
+                                        <span className="block truncate text-[11px] leading-4 text-[#8A94A0]">{zone.label} · {zone.value}</span>
+                                      </span>
+                                      {selected && <Check size={16} className="shrink-0 text-[#4396FB]" strokeWidth={2.8} />}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
                     </div>
                     {/* Repeat dropdown */}
                     <div className="relative inline-block">
-                      <button onClick={() => { setShowRepeatPicker(v => !v); setShowDatePicker(false); setShowStartPicker(false); setShowEndPicker(false); }}
+                      <button onClick={() => { setShowRepeatPicker(v => !v); setShowDatePicker(false); setShowStartPicker(false); setShowEndPicker(false); setShowTimezonePicker(false); }}
                         className="h-9 flex items-center gap-2 px-4 rounded-[10px] bg-[#f1f3f4] text-[14px] leading-5 font-medium text-[#5f6368] hover:bg-[#e8eaed] transition-colors">
                         <span>{repeatVal}</span><ChevronDown size={14} className="text-[#5f6368]" />
                       </button>
@@ -2426,47 +2498,72 @@ export default function App() {
 
                 {/* Schedule Preview — shown when project is selected */}
                 {projectId && (
-                  <div className="px-5 py-4 border-t border-[#f1f3f4]">
-                    <div className="flex items-center justify-between mb-3">
-                      <p className="text-xs font-semibold text-[#5f6368]">
-                        참석자 스케줄 — {fmtDateShort(popupDate)}
-                      </p>
-                      {getDayOffset(popupDate) < 0 && (
-                        <span className="text-[9px] text-[#9aa0a6]">현재 주 범위 외</span>
-                      )}
+                  <div className="flex items-start gap-4 px-5 py-[14px] border-t border-[#f1f3f4]">
+                    <ModalGlyph name="calendar" className="mt-0.5" />
+                    <div className="min-w-0 flex-1">
+                      <button
+                        type="button"
+                        onClick={() => setSchedulePreviewExpanded(prev => !prev)}
+                        className="w-full flex items-start justify-between gap-3 text-left">
+                        <div className="min-w-0">
+                          <p className="text-[14px] leading-5 font-semibold text-[#202124]">
+                            참석자 스케줄
+                          </p>
+                          <p className="mt-0.5 text-[12px] leading-4 text-[#8A94A0]">
+                            {fmtDateShort(popupDate)}의 참석자 일정을 확인해요
+                          </p>
+                        </div>
+                        <ChevronDown size={18} className={`mt-0.5 shrink-0 text-[#4E5968] transition-transform ${schedulePreviewExpanded ? "rotate-180" : ""}`} />
+                      </button>
+                      <AnimatePresence initial={false}>
+                        {schedulePreviewExpanded && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.16 }}
+                            className="overflow-hidden">
+                            <div className="pt-3">
+                              {getDayOffset(popupDate) < 0 && (
+                                <p className="mb-2 text-[10px] leading-[15px] text-[#9aa0a6]">현재 주 범위 외</p>
+                              )}
+                              <SchedulePreview
+                                participants={[ORGANIZER, ...requiredPeople, ...optionalPeople].filter(p => isPersonVisible(p.id))}
+                                dayOffset={getDayOffset(popupDate)}
+                                sampleEvents={sampleEventsForWeek}
+                                selStartH={startH} selStartM={startM}
+                                selEndH={endH} selEndM={endM}
+                              />
+                              {/* Conflict hint */}
+                              {(() => {
+                                const do_ = getDayOffset(popupDate);
+                                if (do_ < 0) return null;
+                                const allP = [ORGANIZER, ...requiredPeople, ...optionalPeople].filter(p => isPersonVisible(p.id));
+                                const conflicts = allP.filter(p => {
+                                  const evs = sampleEventsForWeek.filter(e => e.dayOffset === do_ && COLOR_TO_PID[e.color] === p.id && isEventVisible(e));
+                                  return evs.some(ev => {
+                                    const evEnd = ev.startHour + ev.duration;
+                                    const sStart = startH + startM / 60;
+                                    const sEnd = endH + endM / 60;
+                                    return ev.startHour < sEnd && evEnd > sStart;
+                                  });
+                                });
+                                if (conflicts.length === 0) return (
+                                  <p className="text-[10px] text-[#34a853] mt-2 flex items-center gap-1 font-medium">
+                                    <Check size={10} strokeWidth={3} /> 모든 참석자가 가능한 시간입니다
+                                  </p>
+                                );
+                                return (
+                                  <p className="text-[10px] text-[#f9ab00] mt-2 font-medium">
+                                    ⚠ {conflicts.map(p => p.name).join(", ")}의 일정과 겹칩니다
+                                  </p>
+                                );
+                              })()}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
-                    <SchedulePreview
-                      participants={[ORGANIZER, ...requiredPeople, ...optionalPeople].filter(p => isPersonVisible(p.id))}
-                      dayOffset={getDayOffset(popupDate)}
-                      sampleEvents={sampleEventsForWeek}
-                      selStartH={startH} selStartM={startM}
-                      selEndH={endH} selEndM={endM}
-                    />
-                    {/* Conflict hint */}
-                    {(() => {
-                      const do_ = getDayOffset(popupDate);
-                      if (do_ < 0) return null;
-                      const allP = [ORGANIZER, ...requiredPeople, ...optionalPeople].filter(p => isPersonVisible(p.id));
-                      const conflicts = allP.filter(p => {
-                        const evs = sampleEventsForWeek.filter(e => e.dayOffset === do_ && COLOR_TO_PID[e.color] === p.id && isEventVisible(e));
-                        return evs.some(ev => {
-                          const evEnd = ev.startHour + ev.duration;
-                          const sStart = startH + startM / 60;
-                          const sEnd = endH + endM / 60;
-                          return ev.startHour < sEnd && evEnd > sStart;
-                        });
-                      });
-                      if (conflicts.length === 0) return (
-                        <p className="text-[10px] text-[#34a853] mt-2 flex items-center gap-1 font-medium">
-                          <Check size={10} strokeWidth={3} /> 모든 참석자가 가능한 시간입니다
-                        </p>
-                      );
-                      return (
-                        <p className="text-[10px] text-[#f9ab00] mt-2 font-medium">
-                          ⚠ {conflicts.map(p => p.name).join(", ")}의 일정과 겹칩니다
-                        </p>
-                      );
-                    })()}
                   </div>
                 )}
 
@@ -2477,98 +2574,80 @@ export default function App() {
                 </div>
 
                 {/* Room and location */}
-                <div className="px-5 pt-[14px] pb-[15px] space-y-3">
+                <div className="px-5 pt-[14px] pb-[15px]">
                   {locationMode === "room" ? (
-                    <div className="flex items-start gap-4">
-                      <RoomResourceGlyph />
-                      <div className="flex-1 min-w-0">
-                        <div className="h-10 rounded-[8px] bg-[#E9EDF2] border-b-4 border-[#1A73E8] flex items-center gap-3 px-3">
-                          <Search size={20} className="text-[#4E5968] shrink-0" strokeWidth={2.2} />
-                          <input
-                            autoFocus
-                            value={roomSearch}
-                            onChange={e => setRoomSearch(e.target.value)}
-                            placeholder="Search room or resource"
-                            className="flex-1 bg-transparent outline-none text-[16px] leading-6 text-[#202124] placeholder-[#4E5968]" />
-                          {(roomSearch || roomVal) && (
-                            <button
-                              type="button"
-                              onClick={() => { setRoomSearch(""); setRoomVal(""); }}
-                              className="w-7 h-7 rounded-full hover:bg-[#dfe3ea] flex items-center justify-center"
-                              aria-label="회의실 검색 지우기">
-                              <X size={21} className="text-[#4E5968]" />
-                            </button>
-                          )}
-                        </div>
-
-                        <div className="pt-6">
-                          <div className="flex items-center justify-between mb-3">
-                            <p className="text-[16px] leading-6 font-semibold text-[#202124]">Frequently used</p>
-                            <ChevronDown size={18} className="text-[#202124] rotate-180" />
-                          </div>
-                          <div className="space-y-3">
-                            {ROOM_OPTIONS
-                              .filter(room => `${room.name} ${room.building} ${room.floor}`.toLowerCase().includes(roomSearch.trim().toLowerCase()))
-                              .map(room => {
-                                const roomLabel = `${room.name}  ${room.building}  ${room.floor}`;
-                                const selected = roomVal === roomLabel;
-                                return (
-                                  <button
-                                    key={room.id}
-                                    type="button"
-                                    onClick={() => setRoomVal(roomLabel)}
-                                    className={`w-full flex items-start gap-3 rounded-[8px] px-2 py-2 text-left transition-colors ${selected ? "bg-[#ECF5FF]" : "hover:bg-[#f1f3f4]"}`}>
-                                    <RoomResourceGlyph className="w-5 h-5 shrink-0 mt-0.5" />
-                                    <div className="min-w-0 flex-1">
-                                      <p className="text-[15px] leading-5 font-normal text-[#202124] truncate">{roomLabel}</p>
-                                      <div className="flex items-center gap-1 mt-1 text-[#4E5968]">
-                                        <ModalGlyph name="people" className="w-[18px] h-[18px]" />
-                                        <span className="text-[13px] leading-5">{room.capacity}</span>
-                                      </div>
-                                    </div>
-                                    {selected && <Check size={18} className="text-[#4396FB] mt-0.5" strokeWidth={2.6} />}
-                                  </button>
-                                );
-                              })}
+                    <>
+                      <div className="flex items-start gap-4">
+                        <RoomResourceGlyph />
+                        <div className="flex-1 min-w-0">
+                          <div className="h-9 rounded-[10px] bg-[#f1f3f4] border border-transparent focus-within:border-[#4396FB] flex items-center gap-2.5 px-3 transition-colors">
+                            <Search size={16} className="text-[#8A94A0] shrink-0" strokeWidth={2.1} />
+                            <input
+                              autoFocus
+                              value={roomSearch}
+                              onChange={e => setRoomSearch(e.target.value)}
+                              placeholder="회의실 또는 리소스 검색"
+                              className="flex-1 bg-transparent outline-none text-[14px] leading-5 font-normal text-[#202124] placeholder-[#9aa0a6]" />
+                            {(roomSearch || roomVal) && (
+                              <button
+                                type="button"
+                                onClick={() => { setRoomSearch(""); setRoomVal(""); }}
+                                className="w-6 h-6 rounded-full hover:bg-[#dfe3ea] flex items-center justify-center"
+                                aria-label="회의실 검색 지우기">
+                                <X size={17} className="text-[#6B7683]" />
+                              </button>
+                            )}
                           </div>
 
-                          <div className="border-t border-[#D0D5DA] mt-4 pt-4">
+                          <div className="pt-5">
                             <button
                               type="button"
-                              onClick={() => setRoomVal("")}
-                              className="flex items-center gap-3 text-left">
-                              <span className="text-[14px] leading-5 font-semibold text-[#202124]">No room allocated</span>
-                              <span className="h-8 px-3 rounded-full border border-[#C0C7D1] flex items-center gap-1 text-[13px] text-[#4E5968]">
-                                <ModalGlyph name="people" className="w-[17px] h-[17px]" /> 1 <ChevronDown size={15} />
-                              </span>
+                              onClick={() => setRoomListExpanded(prev => !prev)}
+                              className="w-full flex items-center justify-between mb-3 text-left">
+                              <p className="text-[14px] leading-5 font-semibold text-[#202124]">자주 사용하는 회의실</p>
+                              <ChevronDown size={18} className={`text-[#202124] transition-transform ${roomListExpanded ? "rotate-180" : ""}`} />
                             </button>
-                            <button
-                              type="button"
-                              className="mt-5 text-[16px] leading-6 font-normal text-[#0B57D0] hover:underline">
-                              Browse all rooms & resources
-                            </button>
+                            {roomListExpanded && (
+                              <div className="space-y-3">
+                                {ROOM_OPTIONS
+                                  .filter(room => `${room.name} ${room.building} ${room.floor}`.toLowerCase().includes(roomSearch.trim().toLowerCase()))
+                                  .map(room => {
+                                    const roomLabel = `${room.name}  ${room.building}  ${room.floor}`;
+                                    const selected = roomVal === roomLabel;
+                                    return (
+                                      <button
+                                        key={room.id}
+                                        type="button"
+                                        onClick={() => setRoomVal(roomLabel)}
+                                        className={`w-full flex items-start gap-3 rounded-[8px] px-2 py-2 text-left transition-colors ${selected ? "bg-[#ECF5FF]" : "hover:bg-[#f1f3f4]"}`}>
+                                        <RoomResourceGlyph className="w-5 h-5 shrink-0 mt-0.5" />
+                                        <div className="min-w-0 flex-1">
+                                          <p className="text-[12px] leading-4 font-normal text-[#202124] truncate">{roomLabel}</p>
+                                          <div className="flex items-center gap-1 mt-1 text-[#4E5968]">
+                                            <ModalGlyph name="people" className="w-[18px] h-[18px]" />
+                                            <span className="text-[12px] leading-4">{room.capacity}</span>
+                                          </div>
+                                        </div>
+                                        {selected && <Check size={18} className="text-[#4396FB] mt-0.5" strokeWidth={2.6} />}
+                                      </button>
+                                    );
+                                  })}
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ) : (
+                      <button
+                        type="button"
+                        onClick={() => setLocationMode("location")}
+                        className="mt-4 -mx-5 w-[calc(100%+40px)] border-t border-[#e8eaed] px-5 pt-3 flex items-center gap-4 text-[14px] leading-5 font-normal text-[#9aa0a6] hover:text-[#4396FB] transition-colors text-left">
+                        <ModalGlyph name="pin" />
+                        <span>위치 추가</span>
+                      </button>
+                    </>
+                  ) : locationMode === "location" ? (
                     <div className="flex items-center gap-4">
-                      <RoomResourceGlyph />
-                      <div className="flex-1 text-[14px] leading-5 font-normal text-[#9aa0a6]">
-                        <button
-                          type="button"
-                          onClick={() => setLocationMode("room")}
-                          className="text-[14px] leading-5 font-normal underline underline-offset-[3px] decoration-[#9aa0a6] hover:text-[#4396FB] hover:decoration-[#4396FB] transition-colors">
-                          회의실
-                        </button>
-                        <span className="text-[14px] leading-5 font-normal"> 예약</span>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="flex items-center gap-4">
-                    <ModalGlyph name="pin" />
-                    {locationMode === "location" ? (
+                      <ModalGlyph name="pin" />
                       <input
                         autoFocus
                         type="text"
@@ -2576,15 +2655,28 @@ export default function App() {
                         onChange={e => setLocationVal(e.target.value)}
                         placeholder="위치 설정"
                         className="flex-1 text-[14px] leading-5 font-normal text-[#202124] bg-transparent outline-none placeholder-[#9aa0a6]" />
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => setLocationMode("location")}
-                        className="flex-1 text-left text-[14px] leading-5 font-normal text-[#9aa0a6] hover:text-[#4396FB] transition-colors">
-                        {locationVal || "위치 추가"}
-                      </button>
-                    )}
-                  </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-4">
+                      <ModalGlyph name="pin" />
+                      <div className="flex-1 text-[14px] leading-5 font-normal text-[#9aa0a6]">
+                        <button
+                          type="button"
+                          onClick={() => setLocationMode("room")}
+                          className="text-[14px] leading-5 font-normal underline underline-offset-[3px] decoration-[#9aa0a6] hover:text-[#4396FB] hover:decoration-[#4396FB] transition-colors">
+                          회의실
+                        </button>
+                        <span className="text-[14px] leading-5 font-normal"> 및 </span>
+                        <button
+                          type="button"
+                          onClick={() => setLocationMode("location")}
+                          className="text-[14px] leading-5 font-normal underline underline-offset-[3px] decoration-[#9aa0a6] hover:text-[#4396FB] hover:decoration-[#4396FB] transition-colors">
+                          위치
+                        </button>
+                        <span className="text-[14px] leading-5 font-normal"> 추가</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Description */}
