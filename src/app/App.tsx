@@ -694,6 +694,7 @@ export default function App() {
   const [draggingEvent, setDraggingEvent] = useState<DragEventRef | null>(null);
   const [detailEvent, setDetailEvent] = useState<CalendarEventDetail | null>(null);
   const [meetingResponses, setMeetingResponses] = useState<Record<string, AttendanceStatus>>({});
+  const [attendanceMethodMenuOpen, setAttendanceMethodMenuOpen] = useState(false);
   const [moveBlockedNotice, setMoveBlockedNotice] = useState(false);
   const [allDayVacationDates, setAllDayVacationDates] = useState<string[]>([]);
   const [allDayWorkLocations, setAllDayWorkLocations] = useState<Record<string, "오피스" | "외근" | "집">>({});
@@ -1160,6 +1161,7 @@ export default function App() {
 
   function openEventDetail(ev: CalendarEventDetail) {
     setPopupOpen(false);
+    setAttendanceMethodMenuOpen(false);
     setDetailEvent(ev);
   }
 
@@ -2072,7 +2074,38 @@ export default function App() {
                   </div>
                 </div>
                 {isInvitedMeeting && (
-                  <div className="flex items-center justify-end gap-3 px-5 pt-8 pb-5">
+                  <div className="relative flex items-center justify-end gap-3 px-5 pt-8 pb-5">
+                    <AnimatePresence>
+                      {attendanceMethodMenuOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 6, scale: 0.97 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 6, scale: 0.97 }}
+                          transition={{ duration: 0.15 }}
+                          className="absolute bottom-[66px] right-[210px] z-30 w-[210px] overflow-hidden rounded-[12px] border border-[#e8eaed] bg-white py-1 shadow-[0_8px_24px_rgba(60,64,67,0.2)]">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setMeetingResponses(prev => ({ ...prev, [responseKey]: "accepted" }));
+                              setAttendanceMethodMenuOpen(false);
+                            }}
+                            className="w-full h-12 px-4 flex items-center gap-3 text-[14px] leading-5 font-medium text-[#202124] hover:bg-[#f8f9fa] transition-colors text-left">
+                            <WorkingLocationGlyph type="office" className="w-6 h-6" />
+                            <span>회의실에서 참석</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setMeetingResponses(prev => ({ ...prev, [responseKey]: "accepted" }));
+                              setAttendanceMethodMenuOpen(false);
+                            }}
+                            className="w-full h-12 px-4 flex items-center gap-3 text-[14px] leading-5 font-medium text-[#202124] hover:bg-[#f8f9fa] transition-colors text-left">
+                            <ModalGlyph name="video" />
+                            <span>온라인으로 참석</span>
+                          </button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                     {([
                       ["accepted", "참석"],
                       ["declined", "불참"],
@@ -2083,10 +2116,17 @@ export default function App() {
                         <button
                           key={status}
                           type="button"
-                          onClick={() => setMeetingResponses(prev => ({ ...prev, [responseKey]: status }))}
+                          onClick={() => {
+                            if (status === "accepted") {
+                              setAttendanceMethodMenuOpen(open => !open);
+                              return;
+                            }
+                            setAttendanceMethodMenuOpen(false);
+                            setMeetingResponses(prev => ({ ...prev, [responseKey]: status }));
+                          }}
                           className={`h-10 rounded-full flex items-center justify-center gap-2 text-[14px] leading-5 font-semibold transition-colors ${active ? "px-6 bg-[#4396FB] text-white shadow-[0px_1px_0.75px_rgba(0,0,0,0.1),0px_1px_0.5px_rgba(0,0,0,0.1)]" : "px-[25px] bg-white border border-[#dadce0] text-[#5f6368] hover:bg-[#f8f9fa]"}`}>
                           <span>{label}</span>
-                          {status === "accepted" && active && <ChevronDown size={14} strokeWidth={2} />}
+                          {status === "accepted" && <ChevronDown size={14} strokeWidth={2} className={`transition-transform ${attendanceMethodMenuOpen ? "rotate-180" : ""}`} />}
                         </button>
                       );
                     })}
@@ -2112,11 +2152,10 @@ export default function App() {
               {/* Header */}
               <div className="flex items-center justify-between px-5 py-4 border-b border-[#e8eaed]">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold"
-                    style={{ backgroundColor: ORGANIZER.avatarColor }}>{ORGANIZER.initials.slice(0,1)}</div>
+                  <ProfileAvatar person={ORGANIZER} size={36} />
                   <div>
-                    <p className="text-sm font-semibold text-[#202124]">{ORGANIZER.name}</p>
-                    <p className="text-xs text-[#9aa0a6]">내 캘린더 설정</p>
+                    <p className="text-[14px] leading-5 font-semibold text-[#202124]">{ORGANIZER.name}</p>
+                    <p className="text-[12px] leading-4 font-normal text-[#9aa0a6]">내 캘린더 설정</p>
                   </div>
                 </div>
                 <button onClick={() => setShowMyPrefs(false)}
@@ -2138,12 +2177,9 @@ export default function App() {
               </div>
 
               {/* Content */}
-              <div className="px-5 py-4 min-h-0 flex-1 overflow-y-auto" style={{ scrollbarWidth: "thin" }}>
+              <div className="px-5 py-4 min-h-[200px] flex-1 overflow-y-auto" style={{ scrollbarWidth: "thin" }}>
                 {myPrefsTab === "meeting" && (
-                  <>
-                    <p className="text-xs text-[#9aa0a6] leading-relaxed">
-                      설정된 선호는 캘린더에 <span className="font-semibold">점선</span>으로 표시되어 팀원들이 회의 시간 조율 시 참고합니다.
-                    </p>
+                  <div className="space-y-4">
                     {[
                       { key: "avoidLunch",   label: "점심 직후 회의 기피",   desc: "오후 1:00 – 2:00" },
                       { key: "avoidMorning", label: "오전 9시 이전 회의 기피", desc: "오전 9:00 이전" },
@@ -2153,19 +2189,19 @@ export default function App() {
                       return (
                         <label key={key}
                           onClick={() => setMyPrefs(p => ({ ...p, [key]: !active }))}
-                          className="flex items-center gap-3 cursor-pointer p-3 rounded-xl hover:bg-[#f8f9fa] transition-colors">
-                          <div className={`w-5 h-5 border-2 rounded-md flex items-center justify-center transition-colors shrink-0
+                          className="w-[360px] flex items-center gap-3 cursor-pointer p-3 rounded-[14px] hover:bg-[#f8f9fa] transition-colors">
+                          <div className={`w-5 h-5 border-2 rounded-[8px] flex items-center justify-center transition-colors shrink-0
                             ${active ? "bg-[#4396FB] border-[#4396FB]" : "border-[#dadce0]"}`}>
                             {active && <Check size={11} className="text-white" strokeWidth={3} />}
                           </div>
                           <div className="flex-1">
-                            <p className="text-sm font-medium text-[#202124]">{label}</p>
-                            <p className="text-xs text-[#9aa0a6] mt-0.5">{desc}</p>
+                            <p className="text-[14px] leading-5 font-medium text-[#202124]">{label}</p>
+                            <p className="text-[12px] leading-4 font-medium text-[#9aa0a6] mt-0.5">{desc}</p>
                           </div>
                         </label>
                       );
                     })}
-                  </>
+                  </div>
                 )}
 
                 {myPrefsTab === "ooo" && (
@@ -2220,7 +2256,7 @@ export default function App() {
               </div>
 
               {/* Footer */}
-              <div className="flex items-center justify-end gap-3 px-5 py-4 border-t border-[#e8eaed] bg-white shrink-0">
+              <div className="h-[69px] flex items-center justify-end gap-3 px-5 pt-[17px] pb-4 border-t border-[#e8eaed] bg-white shrink-0">
                 <button onClick={() => setShowMyPrefs(false)} className="text-sm text-[#5f6368] hover:underline">취소</button>
                 <button onClick={() => {
                   const next = Object.fromEntries(workDays.map(day => [day, workLocations[day]]));
