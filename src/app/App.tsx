@@ -353,7 +353,7 @@ function DatePicker({ value, onChange, onClose }: {
           const sel = d.getDate() === value.getDate() && d.getMonth() === value.getMonth();
           return (
             <button key={i} onClick={() => { onChange(d); onClose(); }}
-              className={`w-7 h-7 mx-auto rounded-full text-[11px] font-medium flex items-center justify-center transition-colors
+              className={`w-7 h-7 mx-auto rounded-[8px] text-[11px] font-normal flex items-center justify-center transition-colors
                 ${sel ? "bg-[#4285f4] text-white" : "text-[#202124] hover:bg-[#f1f3f4]"}`}>
               {day}
             </button>
@@ -1437,7 +1437,7 @@ export default function App() {
                 const isT = sameDate(date, today);
                 const isSelected = sameDate(date, selectedDate);
                 return <button key={i} onClick={() => selectMiniDate(date)}
-                  className={`w-7 h-7 mx-auto rounded-full text-[11px] font-medium flex items-center justify-center transition-colors ${
+                  className={`w-7 h-7 mx-auto rounded-[8px] text-[11px] font-normal flex items-center justify-center transition-colors ${
                     isT ? "bg-[#4396FB] text-white"
                       : isSelected ? "bg-[#ECF5FF] text-[#4396FB]"
                         : "text-[#202124] hover:bg-[#f1f3f4]"
@@ -1611,8 +1611,8 @@ export default function App() {
                   return (
                     <div key={idx} className="flex-1 h-[77px] flex flex-col items-center pt-2 pb-2 border-l border-[#e8eaed]">
                       <span className={`text-[11px] leading-[16.5px] font-semibold tracking-[1.1px] uppercase ${tod ? "text-[#4396FB]" : isWknd ? "text-[#bdc1c6]" : "text-[#5f6368]"}`}>{DAYS_KR[day.getDay()]}</span>
-                      <div className={`w-10 h-10 flex items-center justify-center mt-1 transition-colors ${tod ? "rounded-lg bg-[#4396FB]" : "rounded-full hover:bg-[#f1f3f4]"}`}>
-                        <span className={`text-2xl leading-8 font-normal ${tod ? "text-white" : isWknd ? "text-[#bdc1c6]" : "text-[#202124]"}`}>{day.getDate()}</span>
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center mt-1 transition-colors ${tod ? "bg-[#4396FB]" : "hover:bg-[#f1f3f4]"}`}>
+                        <span className={`text-2xl leading-8 font-normal ${tod ? "text-white" : isWknd ? "text-[#bdc1c6]" : "text-[#202124]"}`} style={{ fontWeight: 400 }}>{day.getDate()}</span>
                       </div>
                     </div>
                   );
@@ -2618,7 +2618,7 @@ export default function App() {
                       <button
                         type="button"
                         onClick={() => setSchedulePreviewExpanded(prev => !prev)}
-                        className="w-full flex items-start justify-between gap-3 text-left">
+                        className="w-full relative flex items-start justify-center gap-3 text-center">
                         <div className="min-w-0">
                           <p className="text-[14px] leading-5 font-semibold text-[#202124]">
                             참석자 스케줄
@@ -2627,14 +2627,14 @@ export default function App() {
                             {fmtDateShort(popupDate)}의 참석자 일정을 확인해요
                           </p>
                         </div>
-                        <ChevronDown size={18} className={`mt-0.5 shrink-0 text-[#4E5968] transition-transform ${schedulePreviewExpanded ? "rotate-180" : ""}`} />
+                        <ChevronDown size={18} className={`absolute right-0 mt-0.5 shrink-0 text-[#4E5968] transition-transform ${schedulePreviewExpanded ? "rotate-180" : ""}`} />
                       </button>
                       <AnimatePresence initial={false}>
                         {schedulePreviewExpanded && (
                           <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: "auto" }}
-                            exit={{ opacity: 0, height: 0 }}
+                            initial={{ height: 0 }}
+                            animate={{ height: "auto" }}
+                            exit={{ height: 0 }}
                             transition={{ duration: 0.16 }}
                             className="overflow-hidden">
                             <div className="pt-3">
@@ -2718,8 +2718,8 @@ export default function App() {
                               type="button"
                               onClick={() => setRoomListExpanded(prev => !prev)}
                               className="w-full flex items-center justify-between mb-3 text-left">
-                              <p className="text-[14px] leading-5 font-semibold text-[#202124]">자주 사용하는 회의실</p>
-                              <ChevronDown size={18} className={`text-[#202124] transition-transform ${roomListExpanded ? "rotate-180" : ""}`} />
+                              <p className="text-[14px] leading-5 font-semibold text-[#4E5968]">자주 사용하는 회의실</p>
+                              <ChevronDown size={18} className={`text-[#4E5968] transition-transform ${roomListExpanded ? "rotate-180" : ""}`} />
                             </button>
                             {roomListExpanded && (
                               <div className="space-y-3">
