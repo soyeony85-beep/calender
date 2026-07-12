@@ -53,7 +53,7 @@ const DEFAULT_MEETING_TYPES: MeetingType[] = [
 ];
 
 const PEOPLE: Person[] = [
-  { id: 1, name: "이가영", role: "PO",  initials: "이", avatarColor: "#4285f4", pref: null, prefType: "avoid" },
+  { id: 1, name: "이가영", role: "PO",  initials: "이", avatarColor: "#4C6EF5", pref: null, prefType: "avoid" },
   { id: 2, name: "윤지은", role: "FE",  initials: "윤", avatarColor: "#ea4335", pref: null, prefType: null },
   { id: 3, name: "박은주", role: "UXR", initials: "박", avatarColor: "#f9ab00", pref: "목요일 외근", prefType: "out" },
   { id: 4, name: "정지훈", role: "BE",  initials: "정", avatarColor: "#34a853", pref: "목요일 외근", prefType: "both" },
@@ -106,9 +106,9 @@ const SAMPLE_EVENTS: SampleEvent[] = [
 
   // ─ 수 (Jul 8) ─
   { id: "w1", title: "리서치 발표",            dayOffset: 3, startHour: 10, duration: 1,   color: "#f9ab00" }, // 박은주
-  { id: "w2", title: "스프린트 플래닝",        dayOffset: 3, startHour: 11, duration: 1,   color: "#4396FB" }, // 윤소연
-  { id: "w2-po", title: "스프린트 플래닝",     dayOffset: 3, startHour: 11, duration: 1,   color: "#4285f4" }, // 이가영 참석
-  { id: "w2-qa", title: "스프린트 플래닝",     dayOffset: 3, startHour: 11, duration: 1,   color: "#9334e6" }, // 최이영 참석
+  { id: "w2", title: "사일로 플래닝",        dayOffset: 3, startHour: 11, duration: 1,   color: "#4396FB" }, // 윤소연
+  { id: "w2-po", title: "사일로 플래닝",     dayOffset: 3, startHour: 11, duration: 1,   color: "#4285f4" }, // 이가영 참석
+  { id: "w2-qa", title: "사일로 플래닝",     dayOffset: 3, startHour: 11, duration: 1,   color: "#9334e6" }, // 최이영 참석
   { id: "w3", title: "제품 로드맵 검토",       dayOffset: 3, startHour: 14, duration: 1,   color: "#4285f4" }, // 이가영
   { id: "w4", title: "프로토타입 피드백",      dayOffset: 3, startHour: 14, duration: 1,   color: "#ea4335" }, // 윤지은 (overlap)
   { id: "w5", title: "DB 쿼리 최적화",         dayOffset: 3, startHour: 16, duration: 1,   color: "#34a853" }, // 정지훈
@@ -143,11 +143,19 @@ const EVENT_PALETTE: Record<string, { bg: string; text: string }> = {
   "#34a853": { bg: "#E6F4EA", text: "#137333" }, // 정지훈 — green
   "#9334e6": { bg: "#F0E6FD", text: "#6D28D9" }, // 최이영 — purple
   "#3182F6": { bg: "#EAF1FE", text: "#1A5FCC" }, // toss blue 2
+  "#4C6EF5": { bg: "#EDF0FE", text: "#3B5BDB" }, // 이가영 — selected blue
   "#00C3B2": { bg: "#E0F9F7", text: "#007A70" }, // teal
   "#8B5CF6": { bg: "#EDE9FE", text: "#5B21B6" }, // violet
 };
+function opaquePastel(color: string) {
+  const hex = color.replace("#", "");
+  if (!/^[0-9a-fA-F]{6}$/.test(hex)) return "#F1F3F4";
+  const channels = [0, 2, 4].map(offset => Number.parseInt(hex.slice(offset, offset + 2), 16));
+  const mixed = channels.map(channel => Math.round(channel * 0.13 + 255 * 0.87));
+  return `#${mixed.map(channel => channel.toString(16).padStart(2, "0")).join("")}`;
+}
 function evPalette(color: string) {
-  return EVENT_PALETTE[color] ?? { bg: color + "22", text: color };
+  return EVENT_PALETTE[color] ?? { bg: opaquePastel(color), text: color };
 }
 
 function SuitcaseGlyph() {
@@ -825,7 +833,7 @@ export default function App() {
   const ROOM_OPTIONS = [
     { id: "ut-room", name: "UT룸", building: "HQ", floor: "3F", capacity: 6 },
     { id: "research-room", name: "리서치룸", building: "HQ", floor: "4F", capacity: 6 },
-    { id: "sprint-room", name: "스프린트룸", building: "HQ", floor: "5F", capacity: 8 },
+    { id: "sprint-room", name: "사일로룸", building: "HQ", floor: "5F", capacity: 8 },
   ];
 
   function parsePersonInput(raw: string, fallbackIndex: number) {
@@ -990,7 +998,7 @@ export default function App() {
     ];
     const prevTitles = [
       "킥오프 사전 미팅", "요구사항 정리", "와이어프레임 리뷰", "QA 시나리오 설계", "서버 구조 논의", "실험 결과 공유",
-      "정책 검토 회의", "사용성 인터뷰", "컴포넌트 정리", "스프린트 회고", "배포 체크", "운영 이슈 싱크",
+      "정책 검토 회의", "사용성 인터뷰", "컴포넌트 정리", "사일로 회고", "배포 체크", "운영 이슈 싱크",
     ];
     const titles = weekOffset > 0 ? nextTitles : prevTitles;
     const weekdays = [1, 2, 3, 4, 5];
@@ -999,15 +1007,16 @@ export default function App() {
       const hourDelta = ((index + offsetAbs) % 3) - 1;
       const dayIndex = weekdays.indexOf(event.dayOffset);
       const shiftedDay = weekdays[((dayIndex < 0 ? index : dayIndex) + offsetAbs + index) % weekdays.length];
+      const title = titles[index % titles.length];
       return {
         ...event,
         id: `${event.id}-w${weekOffset}`,
-        title: titles[index % titles.length],
+        title,
         dayOffset: shiftedDay,
         startHour: Math.max(9, Math.min(16, event.startHour + hourDelta)),
         duration: index % 5 === 0 ? Math.min(2, event.duration + 0.5) : event.duration,
       };
-    });
+    }).filter(event => event.title !== "릴리즈 리허설");
   }, [weekOffset]);
   // 오전 1시부터 다음 날 자정(오전 12시)까지 하루 전체 시간축을 표시합니다.
   const hours = Array.from({ length: 24 }, (_, i) => i + 1);
@@ -1302,7 +1311,7 @@ export default function App() {
     if (ev.title.includes("워크숍") || ev.title.includes("발표")) return "회의실 A · 6층";
     if (ev.title.includes("보고") || ev.title.includes("공유")) return "회의실 B · 8층";
     if (ev.title.includes("리뷰") || ev.title.includes("점검")) return "회의실 C · 7층";
-    if (ev.title.includes("싱크") || ev.title.includes("플래닝")) return "스프린트룸 · 5층";
+    if (ev.title.includes("싱크") || ev.title.includes("플래닝")) return "사일로룸 · 5층";
     if (owner.role === "BE") return "개발 회의실 · 7층";
     if (owner.role === "QA") return "QA 랩 · 6층";
     if (owner.role === "UXR") return "리서치룸 · 8층";
@@ -1325,7 +1334,7 @@ export default function App() {
     };
 
     if (title.includes("팀 주간 싱크")) return withOwner([1, 4]);
-    if (title.includes("스프린트 플래닝")) return withOwner([1, 5]);
+    if (title.includes("사일로 플래닝")) return withOwner([1, 5]);
     if (title.includes("UX 워크숍")) return withOwner([2, 3]);
     if (title.includes("릴리즈") || title.includes("배포") || title.includes("QA")) return withOwner([4, 5]);
     if (title.includes("API") || title.includes("DB") || title.includes("BE") || title.includes("서버")) return withOwner([4]);
@@ -1616,7 +1625,7 @@ export default function App() {
             </div>
             <button
               onClick={() => openPopup(selectedDate, 10)}
-              className="mt-4 w-full h-10 rounded-[8px] bg-[#4396FB] text-white text-[14px] leading-5 font-semibold flex items-center justify-center gap-1.5 hover:bg-[#2F7FE6] transition-colors shadow-sm">
+              className="mt-4 w-full h-10 rounded-[8px] bg-[#4396FB] text-white text-[14px] leading-5 font-semibold flex items-center justify-center gap-1.5 hover:bg-[#2F7FE6] transition-colors">
               <Plus size={16} strokeWidth={2.4} />
               <span>만들기</span>
             </button>
@@ -1914,7 +1923,9 @@ export default function App() {
                             const showEvs = evs;
                             const regularEvents = showEvs.filter(item => !item.workLocationType);
                             const hasWorkLocationOverlap = regularEvents.length > 0 && showEvs.some(item => item.workLocationType);
-                            const compactSameStartEvents = !hasWorkLocationOverlap && regularEvents.length > 1 && regularEvents.every(item => item.startHour === regularEvents[0].startHour);
+                            const compactSameStartEvents = !hasWorkLocationOverlap && regularEvents.length > 1
+                              && regularEvents.every(item => item.startHour === regularEvents[0].startHour)
+                              && regularEvents.every(item => item.columns <= regularEvents.length);
                             const GAP = 2; // px gap between cards
                             return (
                               <>
@@ -2032,18 +2043,19 @@ export default function App() {
                             const usedEventColumns = overlappingEvents.length
                               ? Math.max(...overlappingEvents.map(ev => ev.column + 1))
                               : 0;
+                            const preferenceColumnCount = avoidPeople.length;
                             const totalColumns = overlappingEvents.length
-                              ? Math.max(...overlappingEvents.map(ev => ev.columns), usedEventColumns + avoidPeople.length)
-                              : avoidPeople.length;
-                            const preferenceStartColumn = Math.max(0, Math.min(usedEventColumns, totalColumns - avoidPeople.length));
+                              ? Math.max(...overlappingEvents.map(ev => ev.columns), usedEventColumns + preferenceColumnCount)
+                              : preferenceColumnCount;
+                            const preferenceStartColumn = Math.max(0, Math.min(usedEventColumns, totalColumns - preferenceColumnCount));
                             const GAP = 2;
                             const totalMargin = 6 + (totalColumns - 1) * GAP;
                             const widthCalc = `calc((100% - ${totalMargin}px) / ${totalColumns})`;
 
                             return (
                               <>
-                                {avoidPeople.map((p, i) => {
-                                  const column = preferenceStartColumn + i;
+                                {avoidPeople.map((p, preferenceIndex) => {
+                                  const column = preferenceStartColumn + preferenceIndex;
                                   const leftCalc = column === 0
                                     ? "3px"
                                     : `calc(3px + ${column} * ((100% - ${totalMargin}px) / ${totalColumns} + ${GAP}px))`;
@@ -2465,14 +2477,17 @@ export default function App() {
               <div className="h-[69px] flex items-center justify-end gap-3 px-5 pt-[17px] pb-4 border-t border-[#e8eaed] bg-white shrink-0">
                 <button onClick={() => setShowMyPrefs(false)} className="text-sm text-[#5f6368] hover:underline">취소</button>
                 <button onClick={() => {
-                  const next = Object.fromEntries(workDays.map(day => [day, workLocations[day]]));
-                  setSavedWorkLocations(next);
-                  setAppliedMeetingPrefs({
-                    avoidLunch: myPrefs.avoidLunch,
-                    avoidMorning: myPrefs.avoidMorning,
-                    avoidEvening: myPrefs.avoidEvening,
-                  });
-                  setMyPrefs(p => ({ ...p, oooDays: workDays.filter(day => workLocations[day] === "외근") }));
+                  if (myPrefsTab === "meeting") {
+                    setAppliedMeetingPrefs({
+                      avoidLunch: myPrefs.avoidLunch,
+                      avoidMorning: myPrefs.avoidMorning,
+                      avoidEvening: myPrefs.avoidEvening,
+                    });
+                  } else {
+                    const next = Object.fromEntries(workDays.map(day => [day, workLocations[day]]));
+                    setSavedWorkLocations(next);
+                    setMyPrefs(p => ({ ...p, oooDays: workDays.filter(day => workLocations[day] === "외근") }));
+                  }
                   setShowMyPrefs(false);
                 }}
                   className="px-5 py-2 rounded-full bg-[#4396FB] text-white text-sm font-semibold hover:bg-[#2F7FE6] transition-colors shadow-sm">
