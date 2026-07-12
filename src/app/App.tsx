@@ -742,6 +742,8 @@ export default function App() {
   const [teamCalendarsExpanded, setTeamCalendarsExpanded] = useState(true);
   const [teamSearchInput, setTeamSearchInput] = useState("");
   const [teamSearchOpen, setTeamSearchOpen] = useState(false);
+  const [teamSearchFocused, setTeamSearchFocused] = useState(false);
+  const teamCalendarSectionRef = useRef<HTMLDivElement>(null);
   const addCalendarLockRef = useRef<string | null>(null);
   const [visiblePersonIds, setVisiblePersonIds] = useState<number[]>([ORGANIZER.id, ...PEOPLE.map(p => p.id)]);
   const [teamColorMenuId, setTeamColorMenuId] = useState<number | null>(null);
@@ -1218,6 +1220,16 @@ export default function App() {
     return () => document.removeEventListener("mousedown", handler);
   }, [showMyMenu]);
 
+  useEffect(() => {
+    if (!teamSearchOpen) return;
+    const closeTeamSearchOnOutsideClick = (event: MouseEvent) => {
+      if (teamCalendarSectionRef.current?.contains(event.target as Node)) return;
+      setTeamSearchFocused(false);
+    };
+    document.addEventListener("mousedown", closeTeamSearchOnOutsideClick);
+    return () => document.removeEventListener("mousedown", closeTeamSearchOnOutsideClick);
+  }, [teamSearchOpen]);
+
   function sameDate(a: Date, b: Date) {
     return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
   }
@@ -1610,7 +1622,7 @@ export default function App() {
             </button>
           </div>
           <div className="order-2 mx-4 h-px bg-[#e8eaed]" />
-          <div className="order-5 px-4 py-3">
+          <div className="hidden">
             <div className="relative">
             <div className={`flex items-center gap-2 px-3 py-2 rounded-[8px] bg-[#f1f3f4] border ${teamSearchOpen ? "border-[#4396FB]" : "border-transparent"}`}>
               <Search size={13} className="text-[#9aa0a6] shrink-0" />
@@ -1710,13 +1722,57 @@ export default function App() {
             </div>}
           </div>
           <div className="order-4 mx-4 h-px bg-[#e8eaed] my-2" />
-          <div className="order-6 px-3 py-1">
+          <div ref={teamCalendarSectionRef} className="order-6 px-3 py-1">
             <div className="flex items-center justify-between px-2 py-[6px]">
               <span className="text-[11px] leading-[16.5px] font-semibold text-[#5f6368] uppercase tracking-[0.275px]">다른 팀원 캘린더</span>
               <div className="flex items-center gap-0.5">
+                <button onClick={() => { setTeamCalendarsExpanded(true); setTeamSearchOpen(open => !open); setTeamSearchFocused(true); }} className="w-5 h-5 rounded-full hover:bg-[#e8eaed] flex items-center justify-center" aria-label="다른 팀원 캘린더 추가"><Plus size={13} className="text-[#5f6368]" /></button>
                 <button onClick={() => setTeamCalendarsExpanded(v => !v)} className="w-5 h-5 rounded-full hover:bg-[#e8eaed] flex items-center justify-center" aria-label="다른 팀원 캘린더 접기"><ChevronLeft size={13} className={`text-[#5f6368] transition-transform ${teamCalendarsExpanded ? "-rotate-90" : "rotate-180"}`} strokeWidth={1.9} /></button>
               </div>
             </div>
+            <AnimatePresence>
+              {teamSearchOpen && teamCalendarsExpanded && (
+                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="px-2 pt-2 pb-1 overflow-visible">
+                  <div className="relative">
+                    <div className={`h-8 px-2.5 rounded-[8px] bg-[#f1f3f4] border flex items-center gap-2 ${teamSearchFocused ? "border-[#4396FB]" : "border-transparent"}`}>
+                      <Search size={13} className="text-[#8A94A0] shrink-0" />
+                      <input autoFocus type="text" value={teamSearchInput}
+                        onFocus={() => setTeamSearchFocused(true)}
+                        onBlur={() => setTeamSearchFocused(false)}
+                        onChange={event => setTeamSearchInput(event.target.value)}
+                        onKeyDown={event => {
+                          if (event.key === "Enter" && teamSearchInput.trim()) addCalendar(teamSearchInput);
+                          if (event.key === "Escape") { setTeamSearchOpen(false); setTeamSearchInput(""); }
+                        }}
+                        placeholder="이름 또는 역할 검색"
+                        className="min-w-0 flex-1 bg-transparent outline-none text-[12px] text-[#202124] placeholder-[#9aa0a6]" />
+                      {teamSearchInput && <button type="button" onClick={() => setTeamSearchInput("")} className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-[#dfe3e8]" aria-label="검색어 지우기"><X size={13} className="text-[#5f6368]" /></button>}
+                    </div>
+                    {teamSearchInput.trim() && (
+                      <div className="absolute left-0 right-0 top-full mt-1 z-[80] rounded-[10px] border border-[#e8eaed] bg-white p-1 shadow-[0_8px_20px_rgba(49,61,76,0.16)]">
+                        {allPeople.filter(person => `${person.name} ${person.role}`.toLowerCase().includes(teamSearchInput.trim().toLowerCase())).map(person => (
+                          <button key={person.id} type="button" onClick={() => {
+                            setVisiblePersonIds(ids => ids.includes(person.id) ? ids : [...ids, person.id]);
+                            setTeamSearchInput("");
+                            setTeamSearchOpen(false);
+                          }} className="w-full h-10 px-2 flex items-center gap-2 rounded-[8px] text-left hover:bg-[#f1f3f4]">
+                            <ProfileAvatar person={person} size={28} />
+                            <span className="flex-1 truncate text-[12px] text-[#202124]">{person.name}</span>
+                            <span className="px-1.5 py-0.5 rounded-[4px] bg-[#f1f3f4] text-[10px] font-semibold text-[#5f6368]">{person.role}</span>
+                            {isPersonVisible(person.id) && <Check size={13} className="text-[#4396FB]" strokeWidth={2.6} />}
+                          </button>
+                        ))}
+                        {!allPeople.some(person => `${person.name} ${person.role}`.toLowerCase().includes(teamSearchInput.trim().toLowerCase())) && (
+                          <button type="button" onClick={() => addCalendar(teamSearchInput)} className="w-full min-h-10 px-2 flex items-center gap-2 rounded-[8px] text-left text-[12px] text-[#4396FB] hover:bg-[#f1f3f4]">
+                            <Plus size={13} /><span className="truncate">‘{teamSearchInput.trim()}’ 팀원 추가</span>
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
             {teamCalendarsExpanded && allPeople.map(person => (
               <div key={person.id} className="pt-[2px]">
                 <div className="group relative px-3 py-2 rounded-[14px] hover:bg-[#e8edf5] cursor-pointer transition-colors">
