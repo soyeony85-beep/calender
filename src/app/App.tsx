@@ -11,7 +11,7 @@ type ViewMode = "일" | "주" | "월";
 interface Project { id: string; name: string; phase: string; color: string; bg: string; members: number[]; custom?: boolean; }
 interface MeetingType { id: string; label: string; requiredRoles: string[] | null; optionalRoles?: string[] | null; custom?: boolean; }
 interface Person { id: number; name: string; role: string; initials: string; avatarColor: string; pref: string | null; prefType: "avoid" | "out" | "both" | null; avatarTemplate?: number; }
-interface SavedEvent { id: string; meetingId: string; title: string; date: Date; hour: number; duration: number; color: string; personId: number; urgent?: boolean; pendingInvite?: boolean; location?: string; description?: string; workLocationType?: "home" | "office" | "other" | "vacation"; }
+interface SavedEvent { id: string; meetingId: string; title: string; date: Date; hour: number; duration: number; color: string; personId: number; urgent?: boolean; pendingInvite?: boolean; location?: string; description?: string; workLocationType?: "home" | "office" | "other" | "vacation"; cancelsMeetings?: boolean; }
 interface SampleEvent { id: string; title: string; dayOffset: number; startHour: number; duration: number; color: string; }
 interface EventOverride { dayOffset: number; startHour: number; }
 type DragEventRef = { source: "sample" | "saved"; id: string; meetingId?: string; duration: number };
@@ -190,6 +190,22 @@ function VacationGlyph({ className = "w-3 h-3 shrink-0" }: { className?: string 
       <path d="M6.22 9.35c.1-2.18-.12-3.93-.68-5.25" stroke="#8B6A4E" strokeWidth="1.05" strokeLinecap="round"/>
       <path d="M5.58 4.2C4.02 3.98 3 3.2 2.53 1.88c1.45-.2 2.58.33 3.38 1.57C6.15 2 6.9 1.05 8.15.58c.37 1.48-.17 2.62-1.62 3.43 1.3-.46 2.48-.18 3.54.84-1.12.92-2.32 1.02-3.6.3" fill="#69B96B"/>
       <path d="M5.58 4.2C4.02 3.98 3 3.2 2.53 1.88c1.45-.2 2.58.33 3.38 1.57C6.15 2 6.9 1.05 8.15.58c.37 1.48-.17 2.62-1.62 3.43 1.3-.46 2.48-.18 3.54.84-1.12.92-2.32 1.02-3.6.3" stroke="#4D9D58" strokeWidth=".35" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+
+function TaskTargetGlyph({ className = "w-6 h-6 shrink-0" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <path d="M11.0646 17.7919C8.4234 17.7919 6.2826 15.6511 6.2826 13.0099C6.2826 10.3687 8.4234 8.22791 11.0646 8.22791C11.7588 8.22791 12.417 8.37911 13.0122 8.64551C13.5534 8.19611 14.2728 7.62611 15.0318 7.03571C13.8954 6.27971 12.5322 5.83691 11.0646 5.83691C7.1028 5.83691 3.8916 9.04871 3.8916 13.0099C3.8916 16.9711 7.1034 20.1829 11.0646 20.1829C15.0258 20.1829 18.2382 16.9711 18.2382 13.0099C18.2382 11.4871 17.7606 10.0777 16.9512 8.91671C16.3746 9.67811 15.8166 10.4005 15.3744 10.9471C15.6744 11.5723 15.8472 12.2701 15.8472 13.0099C15.8472 15.6511 13.7058 17.7919 11.0646 17.7919Z" fill="#E5E5E5"/>
+      <path d="M11.0639 13.4142C10.9499 13.4142 10.8353 13.371 10.7477 13.2846C10.5713 13.11 10.5695 12.825 10.7441 12.648L12.0977 11.2776C12.0233 11.1366 11.9495 10.965 11.8973 10.776C11.6369 10.6788 11.3579 10.6182 11.0639 10.6182C9.74325 10.6182 8.67285 11.6886 8.67285 13.0092C8.67285 14.3298 9.74325 15.4002 11.0639 15.4002C12.3845 15.4002 13.4549 14.3298 13.4549 13.0092C13.4549 12.6918 13.3901 12.39 13.2779 12.1134C13.0739 12.0636 12.8891 11.9868 12.7379 11.91L11.3843 13.2804C11.2967 13.3698 11.1797 13.4142 11.0639 13.4142Z" fill="#E5E5E5"/>
+      <path d="M21.731 2.80604L22.5542 1.97264C22.7288 1.79624 22.727 1.51064 22.5506 1.33604C22.373 1.16144 22.088 1.16264 21.914 1.34024L21.0908 2.17364C21.1838 2.46704 21.2276 2.67524 21.2276 2.67524C21.2276 2.67524 21.4358 2.71664 21.7304 2.80604H21.731Z" fill="#243D55"/>
+      <path d="M10.7441 12.6501C10.5695 12.8265 10.5713 13.1121 10.7477 13.2867C10.8353 13.3731 10.9499 13.4163 11.0639 13.4163C11.1797 13.4163 11.2961 13.3719 11.3837 13.2825L12.7373 11.9121C12.4979 11.7903 12.3437 11.6709 12.3437 11.6709C12.3437 11.6709 12.2225 11.5179 12.0977 11.2803L10.7441 12.6501Z" fill="#243D55"/>
+      <path d="M18.4984 6.8461C18.4804 6.8701 18.4624 6.9001 18.4444 6.9241C17.9824 7.5421 17.4664 8.2381 16.9504 8.9161C16.3744 9.6781 15.8164 10.3981 15.3724 10.9501C15.0844 11.3041 14.8444 11.5921 14.6884 11.7481C14.2444 12.1981 13.7164 12.2221 13.2784 12.1141C13.0744 12.0661 12.8884 11.9881 12.7384 11.9101C12.4984 11.7901 12.3424 11.6701 12.3424 11.6701C12.3424 11.6701 12.2224 11.5141 12.0964 11.2801C12.0244 11.1361 11.9524 10.9681 11.8984 10.7761C11.7724 10.3321 11.7784 9.7921 12.2344 9.3301C12.3904 9.1741 12.6664 8.9341 13.0144 8.6461C13.5544 8.1961 14.2744 7.6261 15.0304 7.0381C15.7024 6.5161 16.3924 5.9881 17.0044 5.5201C17.0344 5.4961 17.0644 5.4781 17.0944 5.4541C17.2564 6.0781 17.4604 6.4921 17.4604 6.4921C17.4604 6.4921 17.8744 6.6901 18.4984 6.8461Z" fill="#3D3D3D"/>
+      <path d="M17.4588 6.491L21.2292 2.6738C21.2292 2.6738 21.1854 2.4662 21.0924 2.1722C20.7732 1.1678 19.869 -0.850002 18.1038 0.936798C16.6296 2.429 16.7928 4.3082 17.0916 5.4536C17.2554 6.08 17.4588 6.491 17.4588 6.491Z" fill="#A41926"/>
+      <path d="M18.2372 13.0093C18.2372 16.9711 15.0254 20.1823 11.0636 20.1823C7.10182 20.1823 3.89062 16.9705 3.89062 13.0093C3.89062 9.04811 7.10242 5.83631 11.0636 5.83631C12.5312 5.83631 13.8944 6.27911 15.0308 7.03511C15.6998 6.51551 16.3904 5.98631 17.0024 5.52071C15.3704 4.22471 13.3094 3.44531 11.0636 3.44531C5.78122 3.44531 1.49902 7.72751 1.49902 13.0099C1.49902 18.2923 5.78122 22.5745 11.0636 22.5745C16.346 22.5745 20.6282 18.2923 20.6282 13.0099C20.6282 10.6975 19.8074 8.57711 18.4418 6.92351C17.984 7.54151 17.4626 8.23931 16.9496 8.91611C17.759 10.0777 18.2372 11.4865 18.2372 13.0093Z" fill="#EF4452"/>
+      <path d="M11.0642 15.4015C9.74363 15.4015 8.67323 14.3311 8.67323 13.0105C8.67323 11.6899 9.74363 10.6195 11.0642 10.6195C11.3588 10.6195 11.6372 10.6801 11.8976 10.7773C11.7746 10.3315 11.7788 9.79152 12.236 9.32892C12.389 9.17352 12.6674 8.93232 13.0118 8.64612C12.4166 8.37972 11.7584 8.22852 11.0642 8.22852C8.42303 8.22852 6.28223 10.3693 6.28223 13.0105C6.28223 15.6517 8.42303 17.7925 11.0642 17.7925C13.7054 17.7925 15.8462 15.6517 15.8462 13.0105C15.8462 12.2707 15.6734 11.5729 15.3734 10.9477C15.0848 11.3041 14.8418 11.5915 14.6864 11.7487C14.2418 12.1987 13.718 12.2215 13.2782 12.1141C13.3904 12.3913 13.4552 12.6925 13.4552 13.0099C13.4552 14.3305 12.3848 15.4009 11.0642 15.4009V15.4015Z" fill="#EF4452"/>
+      <path d="M17.4586 6.49103C17.4586 6.49103 17.8714 6.68963 18.5002 6.84563C19.6492 7.13063 21.5296 7.27043 23.0038 5.77763C24.769 3.99083 22.7398 3.11123 21.7312 2.80463C21.4366 2.71523 21.2284 2.67383 21.2284 2.67383L17.4586 6.49103Z" fill="#EF4452"/>
     </svg>
   );
 }
@@ -652,10 +668,11 @@ function ScheduleWarningGlyph() {
   return <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M5.01757 1.98936L.843069 9.21996C.406569 9.97596.952269 10.921 1.82527 10.921H10.1746C11.0476 10.921 11.593 9.97596 11.1568 9.21996L6.98197 1.98936C6.54547 1.23336 5.45407 1.23336 5.01757 1.98936Z" fill="#FFCD00"/><path d="M5.99962 8.26367C5.68642 8.26367 5.43262 8.51747 5.43262 8.83067C5.43262 9.14387 5.68642 9.39767 5.99962 9.39767C6.31282 9.39767 6.56662 9.14387 6.56662 8.83067C6.56662 8.51747 6.31282 8.26367 5.99962 8.26367Z" fill="#303D4C"/><path d="M5.99953 7.52318C5.73433 7.52318 5.51953 7.30838 5.51953 7.04318V4.68068C5.51953 4.41548 5.73433 4.20068 5.99953 4.20068C6.26473 4.20068 6.47953 4.41548 6.47953 4.68068V7.04318C6.47953 7.30838 6.26473 7.52318 5.99953 7.52318Z" fill="#303D4C"/></svg>;
 }
 
-function PersonRow({ person, role, onMakeOptional, onRemove }: {
+function PersonRow({ person, role, onMakeOptional, onMakeRequired, onRemove }: {
   person: { id: number; name: string; initials: string; avatarColor: string };
   role: string;
   onMakeOptional?: () => void;
+  onMakeRequired?: () => void;
   onRemove?: () => void;
 }) {
   return (
@@ -667,9 +684,10 @@ function PersonRow({ person, role, onMakeOptional, onRemove }: {
         <p className="text-[14px] leading-5 font-medium text-[#202124] truncate">{person.name}</p>
         <span className="text-[10px] leading-[15px] font-semibold px-[6px] py-[2px] rounded-[4px] bg-[#f1f3f4] text-[#5f6368] shrink-0">{role}</span>
       </div>
-      {(onMakeOptional || onRemove) && <div className="ml-auto flex items-center gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
-        {onMakeOptional && <button type="button" onClick={onMakeOptional} title="선택 참석자로 표시" aria-label={`${person.name} 선택 참석자로 표시`} className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-[#e1e5e9]"><OptionalAttendeeGlyph /></button>}
-        {onRemove && <button type="button" onClick={onRemove} title="삭제" aria-label={`${person.name} 참석자 삭제`} className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-[#e1e5e9]"><X size={14} className="text-[#5F6368]" /></button>}
+      {(onMakeOptional || onMakeRequired || onRemove) && <div className="ml-auto flex items-center gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+        {onMakeOptional && <button type="button" onClick={onMakeOptional} aria-label={`${person.name} 선택 참여자로 표시`} className="group/action relative w-7 h-7 rounded-full flex items-center justify-center hover:bg-[#e1e5e9]"><OptionalAttendeeGlyph /><span role="tooltip" className="pointer-events-none absolute left-1/2 bottom-full mb-1.5 z-[80] -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-[6px] bg-[#313D4C] px-2 py-1 text-[10px] leading-4 font-medium text-white opacity-0 group-hover/action:opacity-100 group-hover/action:translate-y-0 group-focus-visible/action:opacity-100 group-focus-visible/action:translate-y-0 transition-all">선택 참여자로 표시</span></button>}
+        {onMakeRequired && <button type="button" onClick={onMakeRequired} aria-label={`${person.name} 필수 참석자로 표시`} className="group/action relative w-7 h-7 rounded-full flex items-center justify-center hover:bg-[#e1e5e9]"><OptionalAttendeeGlyph /><span role="tooltip" className="pointer-events-none absolute left-1/2 bottom-full mb-1.5 z-[80] -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-[6px] bg-[#313D4C] px-2 py-1 text-[10px] leading-4 font-medium text-white opacity-0 group-hover/action:opacity-100 group-hover/action:translate-y-0 group-focus-visible/action:opacity-100 group-focus-visible/action:translate-y-0 transition-all">필수 참석자로 표시</span></button>}
+        {onRemove && <button type="button" onClick={onRemove} aria-label={`${person.name} 참석자 삭제`} className="group/action relative w-7 h-7 rounded-full flex items-center justify-center hover:bg-[#e1e5e9]"><X size={14} className="text-[#5F6368]" /><span role="tooltip" className="pointer-events-none absolute left-1/2 bottom-full mb-1.5 z-[80] -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-[6px] bg-[#313D4C] px-2 py-1 text-[10px] leading-4 font-medium text-white opacity-0 group-hover/action:opacity-100 group-hover/action:translate-y-0 group-focus-visible/action:opacity-100 group-focus-visible/action:translate-y-0 transition-all">삭제</span></button>}
       </div>}
     </div>
   );
@@ -720,11 +738,10 @@ export default function App() {
   const [allDayWorkLocations, setAllDayWorkLocations] = useState<Record<string, "오피스" | "외근" | "집">>({});
   const [cancelledMeetingDates, setCancelledMeetingDates] = useState<string[]>([]);
   const [miniCalMonth, setMiniCalMonth] = useState(new Date(2026, 6, 1));
-  const [addCalOpen, setAddCalOpen] = useState(false);
   const [myCalendarExpanded, setMyCalendarExpanded] = useState(true);
   const [teamCalendarsExpanded, setTeamCalendarsExpanded] = useState(true);
-  const [addCalInput, setAddCalInput] = useState("");
-  const teamCalendarSectionRef = useRef<HTMLDivElement>(null);
+  const [teamSearchInput, setTeamSearchInput] = useState("");
+  const [teamSearchOpen, setTeamSearchOpen] = useState(false);
   const addCalendarLockRef = useRef<string | null>(null);
   const [visiblePersonIds, setVisiblePersonIds] = useState<number[]>([ORGANIZER.id, ...PEOPLE.map(p => p.id)]);
   const [teamColorMenuId, setTeamColorMenuId] = useState<number | null>(null);
@@ -779,6 +796,7 @@ export default function App() {
   const [attendeeSearchOpen, setAttendeeSearchOpen] = useState(false);
   const [addedAttendeeIds, setAddedAttendeeIds] = useState<number[]>([]);
   const [optionalAttendeeIds, setOptionalAttendeeIds] = useState<number[]>([]);
+  const [requiredAttendeeIds, setRequiredAttendeeIds] = useState<number[]>([]);
   const [removedAttendeeIds, setRemovedAttendeeIds] = useState<number[]>([]);
   const [awayAutoCancel, setAwayAutoCancel] = useState(true);
   const [awayCancelScope, setAwayCancelScope] = useState<"existing" | "all">("all");
@@ -1017,10 +1035,34 @@ export default function App() {
     };
   }, [projectId, selectedProject, selectedMeetingType, allPeople]);
 
+  const visibleRequiredPeople = useMemo(() =>
+    [...requiredPeople.filter(person => !optionalAttendeeIds.includes(person.id)), ...optionalPeople.filter(person => requiredAttendeeIds.includes(person.id))]
+      .filter((person, index, people) => people.findIndex(candidate => candidate.id === person.id) === index && !removedAttendeeIds.includes(person.id)),
+    [requiredPeople, optionalPeople, optionalAttendeeIds, requiredAttendeeIds, removedAttendeeIds]
+  );
+
+  const visibleOptionalPeople = useMemo(() =>
+    [...optionalPeople.filter(person => !requiredAttendeeIds.includes(person.id)), ...requiredPeople.filter(person => optionalAttendeeIds.includes(person.id))]
+      .filter((person, index, people) =>
+        people.findIndex(candidate => candidate.id === person.id) === index &&
+        !removedAttendeeIds.includes(person.id)
+      ),
+    [optionalPeople, requiredPeople, optionalAttendeeIds, requiredAttendeeIds, removedAttendeeIds]
+  );
+
+  function resetAttendeeOverrides() {
+    setAddedAttendeeIds([]);
+    setOptionalAttendeeIds([]);
+    setRequiredAttendeeIds([]);
+    setRemovedAttendeeIds([]);
+    setAttendeeQuery("");
+    setAttendeeSearchOpen(false);
+  }
+
   function openPopup(date: Date, hour: number) {
     setPopupDate(date); setStartH(hour); setStartM(0); setEndH(hour + 1); setEndM(0);
     setPopupTitle(""); setProjectId(null); setMeetingTypeId(null); setRoomVal(""); setRoomSearch(""); setLocationVal(""); setDescriptionVal("");
-    setAttendeeQuery(""); setAttendeeSearchOpen(false); setAddedAttendeeIds([]); setOptionalAttendeeIds([]); setRemovedAttendeeIds([]);
+    setAttendeeQuery(""); setAttendeeSearchOpen(false); setAddedAttendeeIds([]); setOptionalAttendeeIds([]); setRequiredAttendeeIds([]); setRemovedAttendeeIds([]);
     setWorkingLocation(null);
     setAwayAutoCancel(true);
     setAwayCancelScope("all");
@@ -1153,9 +1195,12 @@ export default function App() {
         personId: ORGANIZER.id,
         location: "자리 비움",
         workLocationType: "vacation",
+        cancelsMeetings: awayAutoCancel,
       }]);
     }
-    if (awayAutoCancel) setCancelledMeetingDates(prev => prev.includes(key) ? prev : [...prev, key]);
+    if (awayAutoCancel && isAllDay) {
+      setCancelledMeetingDates(prev => prev.includes(key) ? prev : [...prev, key]);
+    }
     setAllDayWorkLocations(prev => {
       const next = { ...prev };
       delete next[key];
@@ -1172,17 +1217,6 @@ export default function App() {
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [showMyMenu]);
-
-  useEffect(() => {
-    if (!addCalOpen) return;
-    const closeAddCalendarOnOutsideClick = (event: MouseEvent) => {
-      if (teamCalendarSectionRef.current?.contains(event.target as Node)) return;
-      setAddCalOpen(false);
-      setAddCalInput("");
-    };
-    document.addEventListener("mousedown", closeAddCalendarOnOutsideClick);
-    return () => document.removeEventListener("mousedown", closeAddCalendarOnOutsideClick);
-  }, [addCalOpen]);
 
   function sameDate(a: Date, b: Date) {
     return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
@@ -1450,8 +1484,8 @@ export default function App() {
     return cells;
   }, []);
 
-  function addCalendar() {
-    const parsed = parsePersonInput(addCalInput, allPeople.length);
+  function addCalendar(inputValue: string) {
+    const parsed = parsePersonInput(inputValue, allPeople.length);
     if (!parsed?.name) return;
     if (addCalendarLockRef.current === parsed.normalized) return;
     addCalendarLockRef.current = parsed.normalized;
@@ -1459,7 +1493,8 @@ export default function App() {
     const existing = allPeople.find(person => person.name === parsed.name);
     if (ORGANIZER.name === parsed.name || existing || personNameRegistryRef.current.has(parsed.name)) {
       if (existing) setVisiblePersonIds(prev => prev.includes(existing.id) ? prev : [...prev, existing.id]);
-      setAddCalInput("");
+      setTeamSearchInput("");
+      setTeamSearchOpen(false);
       setAddCalOpen(false);
       addCalendarLockRef.current = null;
       return;
@@ -1471,7 +1506,8 @@ export default function App() {
     setAllPeople(prev => [...prev, newPerson]);
     setVisiblePersonIds(prev => prev.includes(newPerson.id) ? prev : [...prev, newPerson.id]);
     setSavedEvents(prev => prev.some(event => event.personId === newPerson.id) ? prev : [...prev, ...defaultEventsForPerson(newPerson)]);
-    setAddCalInput("");
+    setTeamSearchInput("");
+    setTeamSearchOpen(false);
     setAddCalOpen(false);
     window.setTimeout(() => { addCalendarLockRef.current = null; }, 0);
   }
@@ -1543,13 +1579,7 @@ export default function App() {
       <div className="flex flex-1 overflow-hidden">
         {/* ── Sidebar ── */}
         <aside className="w-[256px] shrink-0 bg-white border-r border-[#e8eaed] flex flex-col overflow-hidden">
-          <div className="px-4 pt-5 pb-3">
-            <button
-              onClick={() => openPopup(today, 10)}
-              className="mb-4 w-full h-10 rounded-[14px] bg-[#4396FB] text-white text-[14px] leading-5 font-semibold flex items-center justify-center gap-1.5 hover:bg-[#2F7FE6] transition-colors shadow-sm">
-              <Plus size={16} strokeWidth={2.4} />
-              <span>새 회의</span>
-            </button>
+          <div className="order-1 px-4 pt-4 pb-3">
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm font-medium text-[#202124]">{miniCalMonth.getFullYear()}년 {miniCalMonth.getMonth()+1}월</span>
               <div className="flex gap-0.5">
@@ -1572,16 +1602,58 @@ export default function App() {
                   }`}>{day}</button>;
               })}
             </div>
+            <button
+              onClick={() => openPopup(selectedDate, 10)}
+              className="mt-4 w-full h-10 rounded-[8px] bg-[#4396FB] text-white text-[14px] leading-5 font-semibold flex items-center justify-center gap-1.5 hover:bg-[#2F7FE6] transition-colors shadow-sm">
+              <Plus size={16} strokeWidth={2.4} />
+              <span>만들기</span>
+            </button>
           </div>
-          <div className="mx-4 h-px bg-[#e8eaed]" />
-          <div className="px-4 py-3">
-            <div className="flex items-center gap-2 px-3 py-2 rounded-[8px] bg-[#f1f3f4]">
+          <div className="order-2 mx-4 h-px bg-[#e8eaed]" />
+          <div className="order-5 px-4 py-3">
+            <div className="relative">
+            <div className={`flex items-center gap-2 px-3 py-2 rounded-[8px] bg-[#f1f3f4] border ${teamSearchOpen ? "border-[#4396FB]" : "border-transparent"}`}>
               <Search size={13} className="text-[#9aa0a6] shrink-0" />
-              <input type="text" placeholder="팀원 검색" className="h-5 bg-transparent text-[14px] leading-5 font-normal placeholder-[#9aa0a6] text-[#202124] outline-none w-full" />
+              <input
+                type="text"
+                value={teamSearchInput}
+                onFocus={() => setTeamSearchOpen(true)}
+                onBlur={() => window.setTimeout(() => setTeamSearchOpen(false), 0)}
+                onChange={event => { setTeamSearchInput(event.target.value); setTeamSearchOpen(true); }}
+                onKeyDown={event => {
+                  if (event.key === "Enter" && teamSearchInput.trim()) addCalendar(teamSearchInput);
+                  if (event.key === "Escape") { setTeamSearchOpen(false); setTeamSearchInput(""); }
+                }}
+                placeholder="팀원 검색"
+                className="h-5 bg-transparent text-[14px] leading-5 font-normal placeholder-[#9aa0a6] text-[#202124] outline-none w-full" />
+              {teamSearchInput && <button type="button" onClick={() => setTeamSearchInput("")} className="w-5 h-5 flex items-center justify-center rounded-full hover:bg-[#dfe3e8]" aria-label="검색어 지우기"><X size={13} className="text-[#5f6368]" /></button>}
+            </div>
+            {teamSearchOpen && teamSearchInput.trim() && (
+              <div className="absolute left-0 right-0 top-full mt-1.5 z-[70] rounded-[12px] border border-[#e8eaed] bg-white p-1.5 shadow-[0_8px_24px_rgba(49,61,76,0.16)]">
+                {allPeople.filter(person => `${person.name} ${person.role}`.toLowerCase().includes(teamSearchInput.trim().toLowerCase())).map(person => (
+                  <button key={person.id} type="button" onMouseDown={event => event.preventDefault()} onClick={() => {
+                    setVisiblePersonIds(ids => ids.includes(person.id) ? ids : [...ids, person.id]);
+                    setTeamCalendarsExpanded(true);
+                    setTeamSearchInput("");
+                    setTeamSearchOpen(false);
+                  }} className="w-full h-11 px-2 flex items-center gap-2.5 rounded-[9px] text-left hover:bg-[#f1f3f4]">
+                    <ProfileAvatar person={person} size={30} />
+                    <span className="flex-1 min-w-0 truncate text-[13px] text-[#202124]">{person.name}</span>
+                    <span className="px-1.5 py-0.5 rounded-[4px] bg-[#f1f3f4] text-[10px] font-semibold text-[#5f6368]">{person.role}</span>
+                    {isPersonVisible(person.id) && <Check size={14} className="text-[#4396FB]" strokeWidth={2.6} />}
+                  </button>
+                ))}
+                {!allPeople.some(person => `${person.name} ${person.role}`.toLowerCase().includes(teamSearchInput.trim().toLowerCase())) && (
+                  <button type="button" onMouseDown={event => event.preventDefault()} onClick={() => addCalendar(teamSearchInput)} className="w-full min-h-11 px-3 flex items-center gap-2 rounded-[9px] text-left hover:bg-[#f1f3f4] text-[13px] text-[#4396FB]">
+                    <Plus size={14} /><span className="truncate">‘{teamSearchInput.trim()}’ 팀원 캘린더 추가</span>
+                  </button>
+                )}
+              </div>
+            )}
             </div>
           </div>
-          <div className="mx-4 h-px bg-[#e8eaed] mb-2" />
-          <div className="px-3 py-1">
+          <div className="hidden" />
+          <div className="order-3 px-3 py-1">
             <div className="flex items-center justify-between px-2 py-[6px]">
               <span className="text-[11px] leading-[16.5px] font-semibold text-[#5f6368] uppercase tracking-[0.275px]">내 캘린더</span>
               <button onClick={() => setMyCalendarExpanded(v => !v)} className="w-5 h-5 rounded-full hover:bg-[#e8eaed] flex items-center justify-center" aria-label="내 캘린더 접기">
@@ -1637,33 +1709,14 @@ export default function App() {
               </div>
             </div>}
           </div>
-          <div className="mx-4 h-px bg-[#e8eaed] my-2" />
-          <div ref={teamCalendarSectionRef} className="px-3 py-1">
+          <div className="order-4 mx-4 h-px bg-[#e8eaed] my-2" />
+          <div className="order-6 px-3 py-1">
             <div className="flex items-center justify-between px-2 py-[6px]">
               <span className="text-[11px] leading-[16.5px] font-semibold text-[#5f6368] uppercase tracking-[0.275px]">다른 팀원 캘린더</span>
               <div className="flex items-center gap-0.5">
-                <button onClick={() => setAddCalOpen(v => !v)} className="w-5 h-5 rounded-full hover:bg-[#e8eaed] flex items-center justify-center" aria-label="다른 팀원 캘린더 추가"><Plus size={13} className="text-[#5f6368]" /></button>
                 <button onClick={() => setTeamCalendarsExpanded(v => !v)} className="w-5 h-5 rounded-full hover:bg-[#e8eaed] flex items-center justify-center" aria-label="다른 팀원 캘린더 접기"><ChevronLeft size={13} className={`text-[#5f6368] transition-transform ${teamCalendarsExpanded ? "-rotate-90" : "rotate-180"}`} strokeWidth={1.9} /></button>
               </div>
             </div>
-            <AnimatePresence>
-              {addCalOpen && teamCalendarsExpanded && (
-                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="px-2 pb-1 overflow-hidden">
-                  <div className="flex items-center gap-1.5">
-                    <input autoFocus type="text" value={addCalInput} onChange={e => setAddCalInput(e.target.value)}
-                      onKeyDown={e => { if (e.key === "Enter") addCalendar(); if (e.key === "Escape") setAddCalOpen(false); }}
-                      placeholder="이름 또는 이름 역할"
-                      className="flex-1 h-8 px-2 rounded-[10px] bg-[#f1f3f4] text-xs text-[#202124] placeholder-[#9aa0a6] outline-none border border-[#e8eaed] focus:border-[#4396FB]" />
-                    <button
-                      onClick={addCalendar}
-                      disabled={!addCalInput.trim()}
-                      className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${addCalInput.trim() ? "bg-[#4396FB]" : "bg-[#dfe3e8] cursor-not-allowed"}`}>
-                      <Check size={11} className="text-white" strokeWidth={3} />
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
             {teamCalendarsExpanded && allPeople.map(person => (
               <div key={person.id} className="pt-[2px]">
                 <div className="group relative px-3 py-2 rounded-[14px] hover:bg-[#e8edf5] cursor-pointer transition-colors">
@@ -1789,7 +1842,7 @@ export default function App() {
                       const isWknd = day.getDay() === 0 || day.getDay() === 6;
                       const isLunch = hour === 13;
                       const isVacationDay = allDayVacationDates.includes(localDateKey(day));
-                      const meetingsCancelled = cancelledMeetingDates.includes(localDateKey(day));
+                      const allDayMeetingsCancelled = cancelledMeetingDates.includes(localDateKey(day));
                       const evs = layoutEventsForDay(dayIdx).filter(e => Math.floor(e.startHour) === hour);
                       return (
                         <div key={dayIdx}
@@ -1813,7 +1866,18 @@ export default function App() {
                                   const pendingInvite = (ev as { pendingInvite?: boolean }).pendingInvite;
                                   const canDrag = isOwnEvent(ev);
                                   const isLocationRail = Boolean(ev.workLocationType);
-                                  const locationPastel = "#EAF4FF";
+                                  const meetingsCancelled = !isLocationRail && (
+                                    allDayMeetingsCancelled || savedEvents.some(awayEvent =>
+                                      awayEvent.workLocationType === "vacation" &&
+                                      awayEvent.cancelsMeetings !== false &&
+                                      sameDate(awayEvent.date, day) &&
+                                      awayEvent.id !== ev.id &&
+                                      ev.startHour < awayEvent.hour + awayEvent.duration &&
+                                      ev.startHour + ev.duration > awayEvent.hour
+                                    )
+                                  );
+                                  const locationPastel = `${ev.color}12`;
+                                  const locationRailColor = `${ev.color}66`;
                                   const regularIndex = regularEvents.findIndex(item => item.id === ev.id);
                                   const overlapColumns = hasWorkLocationOverlap ? Math.max(1, regularEvents.length) : ev.columns;
                                   const totalMargin = (hasWorkLocationOverlap ? 29 : 6) + (overlapColumns - 1) * GAP;
@@ -1854,16 +1918,18 @@ export default function App() {
                                         borderLeft: !isLocationRail && ev.workLocationType ? "3px solid #D9F1FF" : undefined,
                                         padding: isLocationRail ? "0" : overlapColumns >= 5 ? "6px 5px" : pendingInvite ? "7.5px 8.5px" : "6px 7px",
                                       }}>
-                                      {isLocationRail && (
-                                        <svg className="absolute inset-0 w-5 h-full" viewBox="0 0 20 60" fill="none" preserveAspectRatio="none" aria-hidden="true">
-                                          <path d="M16 0C18.2091 0 20 1.79086 20 4V16C20 18.2091 18.2091 20 16 20H7C5.89543 20 5 20.8954 5 22V58C5 59.1046 4.10457 60 3 60H2C0.895431 60 0 59.1046 0 58V4C0 1.79086 1.79086 0 4 0H16Z" fill={locationPastel} />
-                                        </svg>
+                                      {isLocationRail && ev.duration > 0.3 && (
+                                        <span
+                                          className="absolute left-0 top-[18px] bottom-0 w-[5px] rounded-b-[4px]"
+                                          style={{ backgroundColor: locationRailColor }}
+                                          aria-hidden="true"
+                                        />
                                       )}
                                       <div className="relative z-10 flex items-center gap-1 min-w-0">
                                         {meetingsCancelled && <X size={11} className="text-[#EA4335] shrink-0" strokeWidth={2.8} />}
                                         {(ev as { urgent?: boolean }).urgent && <img src={EMERGENCY_ICON} alt="" className="w-3 h-3 shrink-0" draggable={false} />}
                                         {ev.workLocationType && (
-                                          <span className={`${isLocationRail ? "w-5 h-5" : "w-5 h-5 -ml-1"} rounded-[4px] text-[#1888E9] flex items-center justify-center shrink-0`} style={{ backgroundColor: isLocationRail ? "transparent" : locationPastel }}>
+                                          <span className={`${isLocationRail ? "w-5 h-5" : "w-5 h-5 -ml-1"} rounded-[4px] text-[#1888E9] flex items-center justify-center shrink-0`} style={{ backgroundColor: locationPastel }}>
                                             {ev.workLocationType === "office" ? <WorkingLocationGlyph type="office" className="w-3 h-3" /> : ev.workLocationType === "home" ? <WorkingLocationGlyph type="home" className="w-3 h-3" /> : ev.workLocationType === "other" ? <OffsiteCarGlyph /> : <VacationGlyph />}
                                           </span>
                                         )}
@@ -2388,7 +2454,7 @@ export default function App() {
               <div className="px-5 pb-4 flex gap-2">
                 {["일정","할 일","근무장소","자리 비움"].map(tab => (
                   <button key={tab} onClick={() => setActiveTab(tab)}
-                    className={`px-4 py-1.5 rounded-full text-[14px] leading-5 font-medium transition-colors ${activeTab === tab ? "bg-[#ECF5FF] text-[#4396FB]" : "text-[#5f6368] hover:bg-[#e8eaed]"}`}>{tab}</button>
+                    className={`px-4 py-1.5 rounded-full text-[14px] leading-5 font-medium transition-colors ${activeTab === tab ? "bg-[#ECF5FF] text-[#4396FB]" : "text-[#5f6368] hover:bg-[#e8eaed]"}`}>{tab === "일정" ? "회의" : tab}</button>
                 ))}
               </div>
 
@@ -2429,7 +2495,7 @@ export default function App() {
                       </div>
                     </div>
                     <div className="h-[54px] px-5 flex items-center gap-4">
-                      <span className="w-6 text-center text-[21px] leading-none">🎯</span>
+                      <span className="w-6 h-6 flex items-center justify-center"><TaskTargetGlyph /></span>
                       <input type="text" value={taskDeadline} onChange={e => setTaskDeadline(e.target.value)} placeholder="마감일 추가" className="flex-1 bg-transparent outline-none text-[14px] leading-5 text-[#202124] placeholder-[#9aa0a6]" />
                     </div>
                     <div className="min-h-[54px] px-5 py-[14px] flex items-start gap-4">
@@ -2657,7 +2723,7 @@ export default function App() {
                           <div key={proj.id}
                             className="group relative h-8 flex items-center rounded-[10px] text-[12px] leading-4 font-semibold transition-all"
                             style={sel ? { backgroundColor: "#ECF5FF", color: "#4396FB" } : { backgroundColor: "#f1f3f4", color: "#5f6368" }}>
-                            <button onClick={() => { setProjectId(sel ? null : proj.id); setMeetingTypeId(null); }}
+                            <button onClick={() => { resetAttendeeOverrides(); setProjectId(sel ? null : proj.id); setMeetingTypeId(null); }}
                               className="h-full min-w-0 flex items-center gap-[6px] rounded-[10px] pl-3 pr-3 transition-[padding] group-hover:pr-7">
                               <span className="truncate text-[12px] leading-4 font-semibold">{proj.name}</span>
                               {sel && <span className="opacity-75 text-[12px] leading-4 whitespace-nowrap">· {proj.phase}</span>}
@@ -2807,7 +2873,7 @@ export default function App() {
                           return (
                             <div key={type.id}
                               className={`group relative h-8 rounded-[10px] text-[12px] leading-4 font-semibold transition-all ${sel ? "bg-[#ECF5FF] text-[#4396FB]" : "bg-[#f1f3f4] text-[#5f6368] hover:bg-[#e8eaed]"}`}>
-                              <button onClick={() => setMeetingTypeId(sel ? null : type.id)}
+                              <button onClick={() => { resetAttendeeOverrides(); setMeetingTypeId(sel ? null : type.id); }}
                                 className={`h-full flex items-center justify-center rounded-[10px] py-2 pl-3 pr-3 transition-[padding] group-hover:pr-7 ${isUrgent ? "gap-1" : ""}`}>
                                 {isUrgent && <img src={EMERGENCY_ICON} alt="" className="w-3 h-3 shrink-0" draggable={false} />}
                                 <span className="text-[12px] leading-4 font-semibold whitespace-nowrap">{type.label}</span>
@@ -2920,16 +2986,22 @@ export default function App() {
                       )}
                     </div>
                     <PersonRow person={ORGANIZER} role="주최자" />
-                    {projectId && requiredPeople.length > 0 && (
+                    {projectId && visibleRequiredPeople.length > 0 && (
                       <>
                         {meetingTypeId && <p className="text-[10px] font-semibold text-[#5f6368] uppercase tracking-wide px-1 pt-3 pb-1">필수 참석자</p>}
-                        {requiredPeople.filter(p => !optionalAttendeeIds.includes(p.id) && !removedAttendeeIds.includes(p.id)).map(p => <PersonRow key={p.id} person={p} role={p.role} onMakeOptional={() => setOptionalAttendeeIds(ids => [...new Set([...ids, p.id])])} onRemove={() => setRemovedAttendeeIds(ids => [...new Set([...ids, p.id])])} />)}
+                        {visibleRequiredPeople.map(p => <PersonRow key={p.id} person={p} role={p.role} onMakeOptional={() => {
+                          if (optionalPeople.some(person => person.id === p.id)) setRequiredAttendeeIds(ids => ids.filter(id => id !== p.id));
+                          else setOptionalAttendeeIds(ids => [...new Set([...ids, p.id])]);
+                        }} onRemove={() => setRemovedAttendeeIds(ids => [...new Set([...ids, p.id])])} />)}
                       </>
                     )}
-                    {projectId && optionalPeople.length > 0 && (
+                    {projectId && visibleOptionalPeople.length > 0 && (
                       <>
                         <p className="text-[10px] font-semibold text-[#5f6368] uppercase tracking-wide px-1 pt-3 pb-1">선택 참석자</p>
-                        {[...optionalPeople, ...requiredPeople.filter(p => optionalAttendeeIds.includes(p.id))].filter((p, index, rows) => rows.findIndex(row => row.id === p.id) === index && !removedAttendeeIds.includes(p.id)).map(p => <PersonRow key={p.id} person={p} role={p.role} onRemove={() => setRemovedAttendeeIds(ids => [...new Set([...ids, p.id])])} />)}
+                        {visibleOptionalPeople.map(p => <PersonRow key={p.id} person={p} role={p.role} onMakeRequired={() => {
+                          if (requiredPeople.some(person => person.id === p.id)) setOptionalAttendeeIds(ids => ids.filter(id => id !== p.id));
+                          else setRequiredAttendeeIds(ids => [...new Set([...ids, p.id])]);
+                        }} onRemove={() => setRemovedAttendeeIds(ids => [...new Set([...ids, p.id])])} />)}
                       </>
                     )}
                     {allPeople.filter(person => addedAttendeeIds.includes(person.id) && !removedAttendeeIds.includes(person.id) && !requiredPeople.some(p => p.id === person.id) && !optionalPeople.some(p => p.id === person.id)).map(person => (
@@ -2972,7 +3044,17 @@ export default function App() {
                               <SchedulePreview
                                 participants={[ORGANIZER, ...requiredPeople, ...optionalPeople, ...allPeople.filter(person => addedAttendeeIds.includes(person.id) && !requiredPeople.some(p => p.id === person.id) && !optionalPeople.some(p => p.id === person.id))].filter((p, index, rows) => rows.findIndex(row => row.id === p.id) === index && !removedAttendeeIds.includes(p.id) && isPersonVisible(p.id))}
                                 dayOffset={getDayOffset(popupDate)}
-                                sampleEvents={sampleEventsForWeek}
+                                sampleEvents={[
+                                  ...sampleEventsForWeek,
+                                  ...savedEvents.filter(event => sameDate(event.date, popupDate)).map(event => ({
+                                    id: `preview-${event.id}`,
+                                    title: event.title,
+                                    dayOffset: getDayOffset(event.date),
+                                    startHour: event.hour,
+                                    duration: event.duration,
+                                    color: event.color,
+                                  })),
+                                ]}
                                 selStartH={startH} selStartM={startM}
                                 selEndH={endH} selEndM={endM}
                               />
@@ -2983,7 +3065,8 @@ export default function App() {
                                 const allP = [ORGANIZER, ...requiredPeople, ...optionalPeople, ...allPeople.filter(person => addedAttendeeIds.includes(person.id) && !requiredPeople.some(p => p.id === person.id) && !optionalPeople.some(p => p.id === person.id))].filter((p, index, rows) => rows.findIndex(row => row.id === p.id) === index && !removedAttendeeIds.includes(p.id) && isPersonVisible(p.id));
                                 const conflicts = allP.filter(p => {
                                   const evs = sampleEventsForWeek.filter(e => e.dayOffset === do_ && COLOR_TO_PID[e.color] === p.id && isEventVisible(e));
-                                  return evs.some(ev => {
+                                  const saved = savedEvents.filter(event => sameDate(event.date, popupDate) && event.personId === p.id);
+                                  return [...evs.map(ev => ({ startHour: ev.startHour, duration: ev.duration })), ...saved.map(event => ({ startHour: event.hour, duration: event.duration }))].some(ev => {
                                     const evEnd = ev.startHour + ev.duration;
                                     const sStart = startH + startM / 60;
                                     const sEnd = endH + endM / 60;
@@ -3006,7 +3089,7 @@ export default function App() {
                                 return (
                                   <p className="mt-2 flex items-center gap-1 text-[10px] leading-[15px] font-medium text-[#D98B00]">
                                     <ScheduleWarningGlyph />
-                                    <span>{warningPeople.map(p => p.name).join(", ")}의 일정 또는 근무 선호와 겹칩니다</span>
+                                    <span>{warningPeople.map(p => p.name).join(", ")}의 일정 또는 개인 근무 선호와 겹칩니다</span>
                                   </p>
                                 );
                               })()}
@@ -3099,13 +3182,32 @@ export default function App() {
                   ) : locationMode === "location" ? (
                     <div className="flex items-center gap-4">
                       <ModalGlyph name="pin" />
-                      <input
-                        autoFocus
-                        type="text"
-                        value={locationVal}
-                        onChange={e => setLocationVal(e.target.value)}
-                        placeholder="위치 설정"
-                        className="flex-1 text-[14px] leading-5 font-normal text-[#202124] bg-transparent outline-none placeholder-[#9aa0a6]" />
+                      <div className="flex-1 min-w-0 flex items-center gap-2">
+                        {roomVal ? (
+                          <button
+                            type="button"
+                            onClick={() => setLocationMode("room")}
+                            className="max-w-[46%] h-8 px-2.5 rounded-[8px] bg-[#ECF5FF] text-[#4396FB] flex items-center gap-1.5 shrink-0 hover:bg-[#deefff]"
+                            title={roomVal}>
+                            <RoomResourceGlyph className="w-4 h-4 shrink-0" />
+                            <span className="text-[12px] leading-4 truncate">{roomVal}</span>
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => setLocationMode("room")}
+                            className="h-8 px-2.5 rounded-[8px] bg-[#f1f3f4] text-[12px] text-[#5f6368] shrink-0 hover:bg-[#e8eaed]">
+                            회의실
+                          </button>
+                        )}
+                        <input
+                          autoFocus
+                          type="text"
+                          value={locationVal}
+                          onChange={e => setLocationVal(e.target.value)}
+                          placeholder="위치 설정"
+                          className="min-w-0 flex-1 h-8 px-2.5 rounded-[8px] bg-[#f1f3f4] text-[14px] leading-5 font-normal text-[#202124] outline-none placeholder-[#9aa0a6] focus:ring-1 focus:ring-[#4396FB]" />
+                      </div>
                     </div>
                   ) : (
                     <div className="flex items-center gap-4">
