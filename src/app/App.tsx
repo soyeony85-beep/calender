@@ -48,7 +48,7 @@ const DEFAULT_MEETING_TYPES: MeetingType[] = [
   { id: "design",  label: "디자인 리뷰",     requiredRoles: ["PO","FE","UXR"] },
   { id: "kickoff", label: "킥오프",          requiredRoles: ["PO","FE","BE","UXR","QA"] },
   { id: "ux",      label: "사용성 테스트",   requiredRoles: ["PO","UXR"] },
-  { id: "sprint",  label: "스프린트 플래닝", requiredRoles: ["PO","FE"] },
+  { id: "sprint",  label: "사일로 플래닝", requiredRoles: ["PO","FE"] },
   { id: "release", label: "릴리즈 점검",     requiredRoles: ["PO","FE","BE","QA"] },
 ];
 
@@ -1685,7 +1685,7 @@ export default function App() {
                   <div className="flex-1 min-w-0">
                     <span className={`block text-[14px] leading-5 font-normal truncate ${isPersonVisible(ORGANIZER.id) ? "text-[#202124]" : "text-[#9aa0a6]"}`}>윤소연</span>
                   </div>
-                  <span className="text-[10px] leading-[15px] font-semibold px-1.5 py-0.5 rounded bg-[#f1f3f4] text-[#5f6368] whitespace-nowrap group-hover:hidden">PD</span>
+                  <span className="text-[10px] leading-[15px] font-semibold px-1.5 py-0.5 rounded-[4px] bg-[#f1f3f4] text-[#5f6368] whitespace-nowrap group-hover:hidden">PD</span>
                   <button
                     onClick={e => { e.stopPropagation(); setShowMyMenu(v => !v); }}
                     className="hidden group-hover:flex w-5 h-5 rounded-full hover:bg-[#d7dde6] items-center justify-center shrink-0"
@@ -1794,7 +1794,7 @@ export default function App() {
                         </span>
                       )}
                     </div>
-                    <span className="text-[10px] leading-[15px] font-semibold px-1.5 py-0.5 rounded bg-[#f1f3f4] text-[#5f6368] whitespace-nowrap group-hover:hidden">{person.role}</span>
+                    <span className="text-[10px] leading-[15px] font-semibold px-1.5 py-0.5 rounded-[4px] bg-[#f1f3f4] text-[#5f6368] whitespace-nowrap group-hover:hidden">{person.role}</span>
                     <div className="hidden group-hover:flex items-center gap-0.5 shrink-0">
                       <button
                         onClick={e => { e.stopPropagation(); removeTeamMember(person.id); }}
@@ -1914,6 +1914,7 @@ export default function App() {
                             const showEvs = evs;
                             const regularEvents = showEvs.filter(item => !item.workLocationType);
                             const hasWorkLocationOverlap = regularEvents.length > 0 && showEvs.some(item => item.workLocationType);
+                            const compactSameStartEvents = !hasWorkLocationOverlap && regularEvents.length > 1 && regularEvents.every(item => item.startHour === regularEvents[0].startHour);
                             const GAP = 2; // px gap between cards
                             return (
                               <>
@@ -1935,11 +1936,13 @@ export default function App() {
                                   const locationPastel = `${ev.color}12`;
                                   const locationRailColor = `${ev.color}66`;
                                   const regularIndex = regularEvents.findIndex(item => item.id === ev.id);
-                                  const overlapColumns = hasWorkLocationOverlap ? Math.max(1, regularEvents.length) : ev.columns;
+                                  const overlapColumns = hasWorkLocationOverlap || compactSameStartEvents ? Math.max(1, regularEvents.length) : ev.columns;
                                   const totalMargin = (hasWorkLocationOverlap ? 29 : 6) + (overlapColumns - 1) * GAP;
                                   const widthCalc = isLocationRail ? "20px" : `calc((100% - ${totalMargin}px) / ${overlapColumns})`;
                                   const leftCalc = isLocationRail ? "3px" : hasWorkLocationOverlap
                                     ? regularIndex === 0 ? "26px" : `calc(26px + ${regularIndex} * ((100% - ${totalMargin}px) / ${overlapColumns} + ${GAP}px))`
+                                    : compactSameStartEvents
+                                    ? regularIndex === 0 ? "3px" : `calc(3px + ${regularIndex} * ((100% - ${totalMargin}px) / ${overlapColumns} + ${GAP}px))`
                                     : ev.column === 0
                                     ? "3px"
                                     : `calc(3px + ${ev.column} * ((100% - ${totalMargin}px) / ${ev.columns} + ${GAP}px))`;
@@ -2862,7 +2865,7 @@ export default function App() {
                                             </div>
                                             <ProfileAvatar person={p} />
                                             <span className={`text-sm flex-1 ${sel ? "text-[#4396FB] font-medium" : "text-[#202124]"}`}>{p.name}</span>
-                                            <span className="text-[10px] leading-[15px] font-semibold px-1.5 py-0.5 rounded-lg bg-[#f1f3f4] text-[#5f6368] shrink-0">{p.role}</span>
+                                            <span className="text-[10px] leading-[15px] font-semibold px-1.5 py-0.5 rounded-[4px] bg-[#f1f3f4] text-[#5f6368] shrink-0">{p.role}</span>
                                           </button>
                                         );
                                       })}
@@ -3035,7 +3038,7 @@ export default function App() {
                                 className="w-full h-11 px-2 flex items-center gap-3 rounded-[10px] text-left hover:bg-[#f1f3f4] transition-colors">
                                 <ProfileAvatar person={person} size={32} />
                                 <span className="flex-1 text-[14px] font-medium text-[#202124]">{person.name}</span>
-                                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-[#f1f3f4] text-[#5f6368]">{person.role}</span>
+                                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-[4px] bg-[#f1f3f4] text-[#5f6368]">{person.role}</span>
                               </button>
                             ))}
                         </div>
